@@ -62,18 +62,26 @@ resource "azurerm_storage_account" "main" {
   account_kind             = "StorageV2"
 
   # Security settings
-  public_network_access_enabled   = false
-  shared_access_key_enabled       = false # No access keys
-  allow_nested_items_to_be_public = false
-  min_tls_version                 = "TLS1_2"
-  https_traffic_only_enabled      = true
+  public_network_access_enabled     = false
+  shared_access_key_enabled         = false # No access keys
+  allow_nested_items_to_be_public   = false
+  min_tls_version                   = "TLS1_2"
+  https_traffic_only_enabled        = true
+  infrastructure_encryption_enabled = true # Required by policy
+  allowed_copy_scope                = "PrivateLink" # Required by policy
 
-  # CMK encryption
+  # CMK encryption for all services
   customer_managed_key {
     key_vault_key_id          = azurerm_key_vault_key.storage_key.id
     managed_hsm_key_id        = null
     user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
   }
+
+  # Table service encryption with CMK
+  table_encryption_key_type = "Account"
+  
+  # Queue service encryption with CMK  
+  queue_encryption_key_type = "Account"
 
   identity {
     type         = "UserAssigned"
@@ -82,7 +90,7 @@ resource "azurerm_storage_account" "main" {
 
   network_rules {
     default_action = "Deny"
-    bypass         = ["AzureServices"]
+    bypass         = ["None"] # Restrict bypass as required by policy
   }
 
   tags = var.tags
@@ -125,22 +133,22 @@ resource "azurerm_private_endpoint" "storage_blob" {
   tags = var.tags
 }
 
-# Private DNS Zone for Key Vault
-resource "azurerm_private_dns_zone" "kv" {
-  name                = "privatelink.vaultcore.azure.net"
-  resource_group_name = var.network_resource_group_name
-  tags                = var.tags
-}
+# Private DNS Zone for Key Vault - Commented out due to policy restrictions
+# resource "azurerm_private_dns_zone" "kv" {
+#   name                = "privatelink.vaultcore.azure.net"
+#   resource_group_name = var.network_resource_group_name
+#   tags                = var.tags
+# }
 
-# Link DNS Zone to VNet
-resource "azurerm_private_dns_zone_virtual_network_link" "kv" {
-  name                  = "kv-dns-link"
-  resource_group_name   = var.network_resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.kv.name
-  virtual_network_id    = var.virtual_network_id
-  registration_enabled  = false
-  tags                  = var.tags
-}
+# Link DNS Zone to VNet - Commented out due to policy restrictions  
+# resource "azurerm_private_dns_zone_virtual_network_link" "kv" {
+#   name                  = "kv-dns-link"
+#   resource_group_name   = var.network_resource_group_name
+#   private_dns_zone_name = azurerm_private_dns_zone.kv.name
+#   virtual_network_id    = var.virtual_network_id
+#   registration_enabled  = false
+#   tags                  = var.tags
+# }
 
 # Private endpoint for Key Vault
 resource "azurerm_private_endpoint" "kv" {
@@ -156,12 +164,10 @@ resource "azurerm_private_endpoint" "kv" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "kv-dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.kv.id]
-  }
+  # private_dns_zone_group {
+  #   name                 = "kv-dns-zone-group"
+  #   private_dns_zone_ids = [azurerm_private_dns_zone.kv.id]
+  # }
 
   tags = var.tags
-
-  depends_on = [azurerm_private_dns_zone_virtual_network_link.kv]
 }
