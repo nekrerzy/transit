@@ -3,6 +3,7 @@
 
 subscription_id            = "your-azure-subscription-id-here"
 private_endpoint_subnet_id = "/subscriptions/your-sub-id/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/virtualNetworks/vnet-name/subnets/subnet-name"
+virtual_network_id         = "/subscriptions/your-sub-id/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/virtualNetworks/vnet-name"
 component                  = "app"
 environment                = "dev"
 region                     = "uaen" 

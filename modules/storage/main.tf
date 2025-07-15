@@ -125,6 +125,23 @@ resource "azurerm_private_endpoint" "storage_blob" {
   tags = var.tags
 }
 
+# Private DNS Zone for Key Vault
+resource "azurerm_private_dns_zone" "kv" {
+  name                = "privatelink.vaultcore.azure.net"
+  resource_group_name = var.resource_group_name
+  tags                = var.tags
+}
+
+# Link DNS Zone to VNet
+resource "azurerm_private_dns_zone_virtual_network_link" "kv" {
+  name                  = "kv-dns-link"
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.kv.name
+  virtual_network_id    = var.virtual_network_id
+  registration_enabled  = false
+  tags                  = var.tags
+}
+
 # Private endpoint for Key Vault
 resource "azurerm_private_endpoint" "kv" {
   name                = "pe-${azurerm_key_vault.storage_kv.name}"
@@ -139,5 +156,12 @@ resource "azurerm_private_endpoint" "kv" {
     is_manual_connection           = false
   }
 
+  private_dns_zone_group {
+    name                 = "kv-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.kv.id]
+  }
+
   tags = var.tags
+
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.kv]
 }

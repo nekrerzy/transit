@@ -38,3 +38,8 @@ variable "private_endpoint_subnet_id" {
   description = "Subnet ID for private endpoints (required for this security model)"
   type        = string
 }
+
+variable "virtual_network_id" {
+  description = "Virtual Network ID for private DNS zone linking"
+  type        = string
+}
