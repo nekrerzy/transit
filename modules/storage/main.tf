@@ -9,7 +9,7 @@ resource "random_string" "storage_suffix" {
 
 # Key Vault for CMK (Customer Managed Keys)
 resource "azurerm_key_vault" "storage_kv" {
-  name                = "kv-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  name                = "kv-${var.component}-${var.environment}-${var.region}-${var.sequence}"
   location            = var.location
   resource_group_name = var.resource_group_name
   tenant_id           = data.azurerm_client_config.current.tenant_id
