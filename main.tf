@@ -14,6 +14,9 @@ terraform {
 
 provider "azurerm" {
   features {}
+  
+  # Set your subscription ID here
+  subscription_id = var.subscription_id
 }
 
 # Data sources
