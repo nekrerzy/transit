@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.0"
+    }
+  }
+}
+
 data "azurerm_client_config" "current" {}
 
 # Reference existing Key Vault from security RG
