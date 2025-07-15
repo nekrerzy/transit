@@ -1,11 +1,12 @@
 # Azure OpenAI Service with enterprise security
 resource "azurerm_cognitive_account" "openai" {
-  name                          = "oai-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
-  location                      = var.location
-  resource_group_name           = var.resource_group_name
-  kind                          = "OpenAI"
-  sku_name                     = "S0"
+  name                           = "oai-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  location                       = var.location
+  resource_group_name            = var.resource_group_name
+  kind                           = "OpenAI"
+  sku_name                      = "S0"
   public_network_access_enabled = false
+  outbound_network_access_restricted = true  # Required by policy
   
   # CMK encryption using existing Key Vault
   customer_managed_key {
