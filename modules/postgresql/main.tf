@@ -123,12 +123,12 @@ resource "azurerm_postgresql_flexible_server" "main" {
     standby_availability_zone = "3"  # Use zone 3 for UAE North
   }
 
-  # CMK encryption
+  # CMK encryption - disable geo-redundant backup CMK due to identity requirements
   customer_managed_key {
-    key_vault_key_id                     = azurerm_key_vault_key.postgres_key.id
-    primary_user_assigned_identity_id    = data.azurerm_user_assigned_identity.existing.id
-    geo_backup_key_vault_key_id         = azurerm_key_vault_key.postgres_key.id
-    geo_backup_user_assigned_identity_id = data.azurerm_user_assigned_identity.existing.id
+    key_vault_key_id                  = azurerm_key_vault_key.postgres_key.id
+    primary_user_assigned_identity_id = data.azurerm_user_assigned_identity.existing.id
+    # geo_backup_key_vault_key_id         = azurerm_key_vault_key.postgres_key.id
+    # geo_backup_user_assigned_identity_id = data.azurerm_user_assigned_identity.existing.id
   }
 
   identity {
