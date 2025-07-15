@@ -61,8 +61,8 @@ resource "azurerm_cognitive_deployment" "gpt41" {
     version = "2025-01-31"
   }
 
-  scale {
-    type     = "Standard"
+  sku {
+    name     = "Standard"
     capacity = var.gpt41_capacity
   }
 }
@@ -78,8 +78,8 @@ resource "azurerm_cognitive_deployment" "text_embedding_3_large" {
     version = "1"
   }
 
-  scale {
-    type     = "Standard"
+  sku {
+    name     = "Standard"
     capacity = var.embedding_capacity
   }
 }
