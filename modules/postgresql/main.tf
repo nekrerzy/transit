@@ -33,7 +33,7 @@ resource "azapi_resource" "postgres_subnet" {
   name      = "SNET-POSTGRES"
   parent_id = "/subscriptions/${var.subscription_id}/resourceGroups/${var.network_resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.virtual_network_name}"
 
-  body = jsonencode({
+  body = {
     properties = {
       addressPrefixes = [var.postgres_subnet_cidr]
       networkSecurityGroup = {
@@ -54,7 +54,7 @@ resource "azapi_resource" "postgres_subnet" {
         }
       ]
     }
-  })
+  }
 }
 
 # Data source to reference the created subnet for other resources
