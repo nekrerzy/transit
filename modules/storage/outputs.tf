@@ -15,12 +15,12 @@ output "storage_account_primary_endpoint" {
 
 output "key_vault_id" {
   description = "ID of the Key Vault"
-  value       = azurerm_key_vault.storage_kv.id
+  value       = data.azurerm_key_vault.existing.id
 }
 
 output "key_vault_uri" {
   description = "URI of the Key Vault"
-  value       = azurerm_key_vault.storage_kv.vault_uri
+  value       = data.azurerm_key_vault.existing.vault_uri
 }
 
 output "resource_group_name" {
@@ -30,5 +30,5 @@ output "resource_group_name" {
 
 output "managed_identity_id" {
   description = "ID of the managed identity"
-  value       = azurerm_user_assigned_identity.storage.id
+  value       = data.azurerm_user_assigned_identity.existing.id
 }

@@ -7,35 +7,22 @@ resource "random_string" "storage_suffix" {
   upper   = false
 }
 
-# Key Vault for CMK (Customer Managed Keys)
-resource "azurerm_key_vault" "storage_kv" {
-  name                = "kv-${var.component}-${var.environment}-${var.region}-${var.sequence}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  sku_name            = "premium"
-
-  enabled_for_disk_encryption     = true
-  enabled_for_deployment          = false
-  enabled_for_template_deployment = false
-  purge_protection_enabled        = true
-  soft_delete_retention_days      = 7
-
-  public_network_access_enabled = false
-  enable_rbac_authorization     = true
-
-  network_acls {
-    default_action = "Deny"
-    bypass         = "AzureServices"
-  }
-
-  tags = var.tags
+# Reference existing Key Vault from security RG
+data "azurerm_key_vault" "existing" {
+  name                = "kv-bain-dev-incp-uaen-01"
+  resource_group_name = "rg-security-dev-incp-uaen-001"
 }
 
-# Key for storage account encryption
+# Reference existing managed identity from security RG
+data "azurerm_user_assigned_identity" "existing" {
+  name                = "id-storage-cmk-dev-incp-uaen-001"
+  resource_group_name = "rg-security-dev-incp-uaen-001"
+}
+
+# Key for storage account encryption in existing Key Vault
 resource "azurerm_key_vault_key" "storage_key" {
-  name         = "key-storage-${var.component}-${var.environment}"
-  key_vault_id = azurerm_key_vault.storage_kv.id
+  name         = "key-storage-${var.component}-${var.environment}-${var.sequence}"
+  key_vault_id = data.azurerm_key_vault.existing.id
   key_type     = "RSA"
   key_size     = 2048
 
@@ -47,8 +34,6 @@ resource "azurerm_key_vault_key" "storage_key" {
     "verify",
     "wrapKey",
   ]
-
-  depends_on = [azurerm_key_vault.storage_kv]
 }
 
 # Storage account with CMK encryption and no access keys
@@ -74,7 +59,7 @@ resource "azurerm_storage_account" "main" {
   customer_managed_key {
     key_vault_key_id          = azurerm_key_vault_key.storage_key.id
     managed_hsm_key_id        = null
-    user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
+    user_assigned_identity_id = data.azurerm_user_assigned_identity.existing.id
   }
 
   # Table service encryption with CMK
@@ -85,7 +70,7 @@ resource "azurerm_storage_account" "main" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.storage.id]
+    identity_ids = [data.azurerm_user_assigned_identity.existing.id]
   }
 
   network_rules {
@@ -96,24 +81,8 @@ resource "azurerm_storage_account" "main" {
   tags = var.tags
 
   depends_on = [
-    azurerm_key_vault_key.storage_key,
-    azurerm_role_assignment.storage_kv_crypto
+    azurerm_key_vault_key.storage_key
   ]
-}
-
-# Managed Identity for storage account
-resource "azurerm_user_assigned_identity" "storage" {
-  name                = "id-storage-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  tags                = var.tags
-}
-
-# Role assignment for storage account to access Key Vault
-resource "azurerm_role_assignment" "storage_kv_crypto" {
-  scope                = azurerm_key_vault.storage_kv.id
-  role_definition_name = "Key Vault Crypto Service Encryption User"
-  principal_id         = azurerm_user_assigned_identity.storage.principal_id
 }
 
 # Private endpoint for storage account blob service
@@ -133,41 +102,4 @@ resource "azurerm_private_endpoint" "storage_blob" {
   tags = var.tags
 }
 
-# Private DNS Zone for Key Vault - Commented out due to policy restrictions
-# resource "azurerm_private_dns_zone" "kv" {
-#   name                = "privatelink.vaultcore.azure.net"
-#   resource_group_name = var.network_resource_group_name
-#   tags                = var.tags
-# }
-
-# Link DNS Zone to VNet - Commented out due to policy restrictions  
-# resource "azurerm_private_dns_zone_virtual_network_link" "kv" {
-#   name                  = "kv-dns-link"
-#   resource_group_name   = var.network_resource_group_name
-#   private_dns_zone_name = azurerm_private_dns_zone.kv.name
-#   virtual_network_id    = var.virtual_network_id
-#   registration_enabled  = false
-#   tags                  = var.tags
-# }
-
-# Private endpoint for Key Vault
-resource "azurerm_private_endpoint" "kv" {
-  name                = "pe-${azurerm_key_vault.storage_kv.name}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.private_endpoint_subnet_id
-
-  private_service_connection {
-    name                           = "psc-${azurerm_key_vault.storage_kv.name}"
-    private_connection_resource_id = azurerm_key_vault.storage_kv.id
-    subresource_names              = ["vault"]
-    is_manual_connection           = false
-  }
-
-  # private_dns_zone_group {
-  #   name                 = "kv-dns-zone-group"
-  #   private_dns_zone_ids = [azurerm_private_dns_zone.kv.id]
-  # }
-
-  tags = var.tags
-}
+# Key Vault private endpoint already exists in security RG - no need to create
