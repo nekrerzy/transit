@@ -6,7 +6,7 @@ private_endpoint_subnet_id        = "/subscriptions/b65e6929-28d1-4b59-88f3-570a
 virtual_network_id                = "/subscriptions/b65e6929-28d1-4b59-88f3-570a0df91662/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/virtualNetworks/vnet-bain-dev-incp-uaen-001"
 postgres_subnet_cidr              = "172.20.161.0/28"
 postgresql_private_dns_zone_id    = "/subscriptions/b65e6929-28d1-4b59-88f3-570a0df91662/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/privateDnsZones/psql-bain-dev-incp-uaen-001.private.postgres.database.azure.com"
-postgresql_admin_password         = "YourSecurePassword123!"
+# postgresql_admin_password auto-generated as random 24-character password
 component                         = "app"
 environment                       = "dev"
 region                            = "uaen" 

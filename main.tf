@@ -54,7 +54,7 @@ module "postgresql" {
   postgres_subnet_cidr       = var.postgres_subnet_cidr
   private_endpoint_subnet_id = var.private_endpoint_subnet_id
   private_dns_zone_id        = var.postgresql_private_dns_zone_id
-  admin_password             = var.postgresql_admin_password
+  # admin_password auto-generated in module
   component                  = var.component
   environment                = var.environment
   region                     = var.region

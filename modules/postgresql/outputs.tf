@@ -28,3 +28,9 @@ output "database_name" {
   description = "Name of the created database"
   value       = var.create_sample_database ? azurerm_postgresql_flexible_server_database.example[0].name : null
 }
+
+output "admin_password" {
+  description = "Generated administrator password"
+  value       = random_password.postgres_admin.result
+  sensitive   = true
+}

@@ -31,6 +31,15 @@ data "azurerm_user_assigned_identity" "existing" {
   resource_group_name = "rg-security-dev-incp-uaen-001"
 }
 
+# Generate random password for PostgreSQL admin
+resource "random_password" "postgres_admin" {
+  length  = 24
+  special = true
+  upper   = true
+  lower   = true
+  numeric = true
+}
+
 # Key for PostgreSQL encryption in existing Key Vault
 resource "azurerm_key_vault_key" "postgres_key" {
   name         = "key-postgres-${var.component}-${var.environment}-${var.sequence}"
@@ -57,7 +66,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   # Server configuration
   version                      = "15"
   administrator_login          = var.admin_username
-  administrator_password       = var.admin_password
+  administrator_password       = random_password.postgres_admin.result
   sku_name                    = var.sku_name
   storage_mb                  = var.storage_mb
   storage_tier                = "P30"

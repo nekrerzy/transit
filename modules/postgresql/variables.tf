@@ -34,11 +34,7 @@ variable "admin_username" {
   default     = "psqladmin"
 }
 
-variable "admin_password" {
-  description = "Administrator password for PostgreSQL"
-  type        = string
-  sensitive   = true
-}
+# admin_password removed - using random_password resource instead
 
 variable "sku_name" {
   description = "PostgreSQL SKU name"

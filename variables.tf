@@ -53,11 +53,7 @@ variable "postgresql_private_dns_zone_id" {
   type        = string
 }
 
-variable "postgresql_admin_password" {
-  description = "Administrator password for PostgreSQL"
-  type        = string
-  sensitive   = true
-}
+# postgresql_admin_password removed - using random_password resource instead
 
 variable "location" {
   description = "Azure region"

@@ -33,3 +33,9 @@ output "postgresql_database_name" {
   description = "Name of the PostgreSQL database"
   value       = module.postgresql.database_name
 }
+
+output "postgresql_admin_password" {
+  description = "Generated PostgreSQL admin password"
+  value       = module.postgresql.admin_password
+  sensitive   = true
+}
