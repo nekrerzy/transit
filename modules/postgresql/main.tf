@@ -111,7 +111,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   storage_mb                  = var.storage_mb
   storage_tier                = "P30"
   backup_retention_days       = 35
-  geo_redundant_backup_enabled = true
+  geo_redundant_backup_enabled = false  # Disabled due to CMK complexity
   zone                        = "1"  # Primary in zone 1, standby in zone 3
 
   # Security settings
