@@ -47,9 +47,6 @@ resource "azapi_resource" "postgres_subnet" {
           name = "postgres-delegation"
           properties = {
             serviceName = "Microsoft.DBforPostgreSQL/flexibleServers"
-            actions = [
-              "Microsoft.Network/virtualNetworks/subnets/join/action"
-            ]
           }
         }
       ]
