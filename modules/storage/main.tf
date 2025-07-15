@@ -128,14 +128,14 @@ resource "azurerm_private_endpoint" "storage_blob" {
 # Private DNS Zone for Key Vault
 resource "azurerm_private_dns_zone" "kv" {
   name                = "privatelink.vaultcore.azure.net"
-  resource_group_name = var.resource_group_name
+  resource_group_name = var.network_resource_group_name
   tags                = var.tags
 }
 
 # Link DNS Zone to VNet
 resource "azurerm_private_dns_zone_virtual_network_link" "kv" {
   name                  = "kv-dns-link"
-  resource_group_name   = var.resource_group_name
+  resource_group_name   = var.network_resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.kv.name
   virtual_network_id    = var.virtual_network_id
   registration_enabled  = false

@@ -43,3 +43,9 @@ variable "virtual_network_id" {
   description = "Virtual Network ID for private DNS zone linking"
   type        = string
 }
+
+variable "network_resource_group_name" {
+  description = "Network resource group name for DNS zones"
+  type        = string
+  default     = "rg-network-dev-incp-uaen-001"
+}
