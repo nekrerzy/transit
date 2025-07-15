@@ -68,7 +68,7 @@ resource "azurerm_storage_account" "main" {
   min_tls_version                   = "TLS1_2"
   https_traffic_only_enabled        = true
   infrastructure_encryption_enabled = true # Required by policy
-  allowed_copy_scope                = "PrivateLink" # Required by policy
+  allowed_copy_scope                = "AAD" # Required by policy
 
   # CMK encryption for all services
   customer_managed_key {
