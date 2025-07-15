@@ -85,9 +85,9 @@ output "openai_primary_access_key" {
   sensitive   = true
 }
 
-output "gpt4o_deployment_name" {
-  description = "Name of the GPT-4o deployment"
-  value       = module.openai.gpt4o_deployment_name
+output "gpt41_deployment_name" {
+  description = "Name of the GPT-4.1 deployment"
+  value       = module.openai.gpt41_deployment_name
 }
 
 output "embedding_deployment_name" {

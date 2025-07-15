@@ -28,8 +28,8 @@ variable "sequence" {
   type        = string
 }
 
-variable "gpt4o_capacity" {
-  description = "Capacity for GPT-4o deployment (TPM in thousands)"
+variable "gpt41_capacity" {
+  description = "Capacity for GPT-4.1 deployment (TPM in thousands)"
   type        = number
   default     = 30
 }

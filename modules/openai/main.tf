@@ -50,20 +50,20 @@ resource "azurerm_key_vault_key" "openai_key" {
   ]
 }
 
-# GPT-4o model deployment
-resource "azurerm_cognitive_deployment" "gpt4o" {
-  name                 = "gpt-4o"
+# GPT-4.1 model deployment (latest 2025 version)
+resource "azurerm_cognitive_deployment" "gpt41" {
+  name                 = "gpt-41"
   cognitive_account_id = azurerm_cognitive_account.openai.id
 
   model {
     format  = "OpenAI"
-    name    = "gpt-4o"
-    version = "2024-08-06"
+    name    = "gpt-41"
+    version = "2025-01-31"
   }
 
   scale {
     type     = "Standard"
-    capacity = var.gpt4o_capacity
+    capacity = var.gpt41_capacity
   }
 }
 
