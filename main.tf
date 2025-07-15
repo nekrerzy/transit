@@ -13,11 +13,7 @@ terraform {
 }
 
 provider "azurerm" {
-  features {
-    storage_account {
-      prevent_nested_items_deletion = false
-    }
-  }
+  features {}
 }
 
 # Data sources
