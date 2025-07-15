@@ -44,3 +44,21 @@ module "storage_account" {
   
   tags = var.common_tags
 }
+
+# PostgreSQL module
+module "postgresql" {
+  source = "./modules/postgresql"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  delegated_subnet_id        = var.postgresql_delegated_subnet_id
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  private_dns_zone_id        = var.postgresql_private_dns_zone_id
+  admin_password             = var.postgresql_admin_password
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}

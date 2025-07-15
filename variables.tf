@@ -42,6 +42,22 @@ variable "virtual_network_id" {
   type        = string
 }
 
+variable "postgresql_delegated_subnet_id" {
+  description = "Subnet ID for PostgreSQL delegation"
+  type        = string
+}
+
+variable "postgresql_private_dns_zone_id" {
+  description = "Private DNS zone ID for PostgreSQL"
+  type        = string
+}
+
+variable "postgresql_admin_password" {
+  description = "Administrator password for PostgreSQL"
+  type        = string
+  sensitive   = true
+}
+
 variable "location" {
   description = "Azure region"
   type        = string

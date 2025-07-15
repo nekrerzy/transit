@@ -17,3 +17,19 @@ output "resource_group_name" {
   description = "Name of the created resource group"
   value       = module.storage_account.resource_group_name
 }
+
+# PostgreSQL outputs
+output "postgresql_server_name" {
+  description = "Name of the PostgreSQL server"
+  value       = module.postgresql.postgresql_server_name
+}
+
+output "postgresql_server_fqdn" {
+  description = "FQDN of the PostgreSQL server"
+  value       = module.postgresql.postgresql_server_fqdn
+}
+
+output "postgresql_database_name" {
+  description = "Name of the PostgreSQL database"
+  value       = module.postgresql.database_name
+}
