@@ -67,3 +67,30 @@ output "redis_primary_access_key" {
   value       = module.redis.redis_primary_access_key
   sensitive   = true
 }
+
+# Azure OpenAI outputs
+output "openai_account_name" {
+  description = "Name of the Azure OpenAI account"
+  value       = module.openai.openai_account_name
+}
+
+output "openai_endpoint" {
+  description = "Endpoint URL for Azure OpenAI"
+  value       = module.openai.openai_endpoint
+}
+
+output "openai_primary_access_key" {
+  description = "Primary access key for Azure OpenAI"
+  value       = module.openai.openai_primary_access_key
+  sensitive   = true
+}
+
+output "gpt4o_deployment_name" {
+  description = "Name of the GPT-4o deployment"
+  value       = module.openai.gpt4o_deployment_name
+}
+
+output "embedding_deployment_name" {
+  description = "Name of the text embedding deployment"
+  value       = module.openai.embedding_deployment_name
+}

@@ -49,6 +49,21 @@ module "storage_account" {
   tags = var.common_tags
 }
 
+# Azure OpenAI module
+module "openai" {
+  source = "./modules/openai"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
+
 # PostgreSQL module
 module "postgresql" {
   source = "./modules/postgresql"
@@ -60,6 +75,21 @@ module "postgresql" {
   private_endpoint_subnet_id = var.private_endpoint_subnet_id
   private_dns_zone_id        = var.postgresql_private_dns_zone_id
   # admin_password auto-generated in module
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
+
+# Azure OpenAI module
+module "openai" {
+  source = "./modules/openai"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
   component                  = var.component
   environment                = var.environment
   region                     = var.region
@@ -83,9 +113,39 @@ module "search" {
   tags = var.common_tags
 }
 
+# Azure OpenAI module
+module "openai" {
+  source = "./modules/openai"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
+
 # Redis module
 module "redis" {
   source = "./modules/redis"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
+
+# Azure OpenAI module
+module "openai" {
+  source = "./modules/openai"
   
   resource_group_name         = azurerm_resource_group.main.name
   location                   = azurerm_resource_group.main.location
