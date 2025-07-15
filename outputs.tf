@@ -39,3 +39,31 @@ output "postgresql_admin_password" {
   value       = module.postgresql.admin_password
   sensitive   = true
 }
+
+# Azure Search outputs
+output "search_service_name" {
+  description = "Name of the Azure Search service"
+  value       = module.search.search_service_name
+}
+
+output "search_service_url" {
+  description = "URL of the Azure Search service"
+  value       = module.search.search_service_url
+}
+
+# Redis outputs
+output "redis_cache_name" {
+  description = "Name of the Redis cache"
+  value       = module.redis.redis_cache_name
+}
+
+output "redis_hostname" {
+  description = "Hostname of the Redis cache"
+  value       = module.redis.redis_hostname
+}
+
+output "redis_primary_access_key" {
+  description = "Primary access key for Redis"
+  value       = module.redis.redis_primary_access_key
+  sensitive   = true
+}
