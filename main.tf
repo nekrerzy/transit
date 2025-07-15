@@ -49,21 +49,6 @@ module "storage_account" {
   tags = var.common_tags
 }
 
-# Azure OpenAI module
-module "openai" {
-  source = "./modules/openai"
-  
-  resource_group_name         = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  component                  = var.component
-  environment                = var.environment
-  region                     = var.region
-  sequence                   = var.sequence
-  
-  tags = var.common_tags
-}
-
 # PostgreSQL module
 module "postgresql" {
   source = "./modules/postgresql"
@@ -83,39 +68,9 @@ module "postgresql" {
   tags = var.common_tags
 }
 
-# Azure OpenAI module
-module "openai" {
-  source = "./modules/openai"
-  
-  resource_group_name         = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  component                  = var.component
-  environment                = var.environment
-  region                     = var.region
-  sequence                   = var.sequence
-  
-  tags = var.common_tags
-}
-
 # Azure Search module
 module "search" {
   source = "./modules/search"
-  
-  resource_group_name         = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  component                  = var.component
-  environment                = var.environment
-  region                     = var.region
-  sequence                   = var.sequence
-  
-  tags = var.common_tags
-}
-
-# Azure OpenAI module
-module "openai" {
-  source = "./modules/openai"
   
   resource_group_name         = azurerm_resource_group.main.name
   location                   = azurerm_resource_group.main.location
