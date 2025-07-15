@@ -112,15 +112,16 @@ resource "azurerm_postgresql_flexible_server" "main" {
   storage_tier                = "P30"
   backup_retention_days       = 35
   geo_redundant_backup_enabled = true
+  zone                        = "1"  # Primary in zone 1, standby in zone 3
 
   # Security settings
   public_network_access_enabled = false
   
-  # High availability (disabled initially due to zone config issues)
-  # high_availability {
-  #   mode                      = "ZoneRedundant"
-  #   standby_availability_zone = var.standby_availability_zone
-  # }
+  # High availability - required by policy for zone resiliency
+  high_availability {
+    mode                      = "ZoneRedundant"
+    standby_availability_zone = "3"  # Use zone 3 for UAE North
+  }
 
   # CMK encryption
   customer_managed_key {
