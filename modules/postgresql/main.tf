@@ -116,11 +116,11 @@ resource "azurerm_postgresql_flexible_server" "main" {
   # Security settings
   public_network_access_enabled = false
   
-  # High availability
-  high_availability {
-    mode                      = "ZoneRedundant"
-    standby_availability_zone = var.standby_availability_zone
-  }
+  # High availability (disabled initially due to zone config issues)
+  # high_availability {
+  #   mode                      = "ZoneRedundant"
+  #   standby_availability_zone = var.standby_availability_zone
+  # }
 
   # CMK encryption
   customer_managed_key {
