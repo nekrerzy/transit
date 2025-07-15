@@ -19,10 +19,7 @@ output "postgresql_admin_username" {
   sensitive   = true
 }
 
-output "private_endpoint_id" {
-  description = "ID of the private endpoint"
-  value       = azurerm_private_endpoint.postgres.id
-}
+# Private endpoint not used - PostgreSQL has private access via delegated subnet
 
 output "database_name" {
   description = "Name of the created database"

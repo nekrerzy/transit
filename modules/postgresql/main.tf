@@ -152,22 +152,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   depends_on = [azurerm_key_vault_key.postgres_key]
 }
 
-# Private endpoint for PostgreSQL
-resource "azurerm_private_endpoint" "postgres" {
-  name                = "pe-${azurerm_postgresql_flexible_server.main.name}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.private_endpoint_subnet_id
-
-  private_service_connection {
-    name                           = "psc-${azurerm_postgresql_flexible_server.main.name}"
-    private_connection_resource_id = azurerm_postgresql_flexible_server.main.id
-    subresource_names              = ["postgresqlServer"]
-    is_manual_connection           = false
-  }
-
-  tags = var.tags
-}
+# Private endpoint not needed - PostgreSQL uses delegated subnet for private access
 
 # PostgreSQL configuration for security
 resource "azurerm_postgresql_flexible_server_configuration" "log_connections" {
