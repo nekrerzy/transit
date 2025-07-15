@@ -1,0 +1,45 @@
+terraform {
+  required_version = ">= 1.5"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.36"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {
+    storage_account {
+      prevent_nested_items_deletion = false
+    }
+  }
+}
+
+# Data sources
+data "azurerm_client_config" "current" {}
+
+# Main resource group for all resources
+resource "azurerm_resource_group" "main" {
+  name     = "rg-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  location = var.location
+  tags     = var.common_tags
+}
+
+# Storage account module
+module "storage_account" {
+  source = "./modules/storage"
+  
+  resource_group_name = azurerm_resource_group.main.name
+  location           = azurerm_resource_group.main.location
+  component          = var.component
+  environment        = var.environment
+  region             = var.region
+  sequence           = var.sequence
+  
+  tags = var.common_tags
+}

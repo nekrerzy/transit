@@ -1,0 +1,15 @@
+# Example terraform.tfvars file
+# Copy this to terraform.tfvars and customize for your environment
+
+component    = "app"
+environment  = "dev"
+region       = "uaen" 
+sequence     = "001"
+location     = "UAE North"
+
+common_tags = {
+  Environment = "dev"
+  Project     = "bain"
+  ManagedBy   = "terraform"
+  CostCenter  = "IT"
+}
