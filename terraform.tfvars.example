@@ -14,8 +14,9 @@ sequence                          = "002"
 location                          = "UAE North"
 
 common_tags = {
-  Environment = "dev"
-  Project     = "bain"
-  ManagedBy   = "terraform"
-  CostCenter  = "IT"
+  Environment  = "dev"
+  Project      = "bain"
+  ManagedBy    = "terraform"
+  CostCenter   = "IT"
+  Sovereignty  = "Confidential"
 }
