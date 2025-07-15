@@ -20,12 +20,12 @@ resource "azurerm_kubernetes_cluster" "aks" {
     outbound_type      = "userDefinedRouting"
   }
 
-  # Default system node pool (will be replaced by dedicated system pool)
+  # Default system node pool
   default_node_pool {
     name                = "system"
     node_count          = var.system_node_count
     vm_size             = var.system_vm_size
-    vnet_subnet_id      = azapi_resource.aks_system_subnet.id
+    vnet_subnet_id      = var.aks_subnet_id
     zones               = var.availability_zones
     enable_auto_scaling = true
     min_count          = var.system_min_count
@@ -55,7 +55,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   # API server access profile for private cluster
   api_server_access_profile {
     vnet_integration_enabled = true
-    subnet_id               = azapi_resource.aks_api_subnet.id
+    subnet_id               = var.aks_subnet_id
   }
 
   # Auto scaler profile
@@ -95,11 +95,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   oidc_issuer_enabled      = true
 
   tags = var.tags
-
-  depends_on = [
-    azapi_resource.aks_system_subnet,
-    azapi_resource.aks_api_subnet
-  ]
 }
 
 # Reference existing Key Vault from security RG
@@ -146,98 +141,6 @@ resource "azurerm_disk_encryption_set" "aks" {
   tags = var.tags
 }
 
-# AKS System subnet using AzAPI (to bypass NSG/UDR policies)
-resource "azapi_resource" "aks_system_subnet" {
-  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
-  name      = "snet-aks-system-${var.environment}-${var.region}-${var.sequence}"
-  parent_id = var.virtual_network_id
-
-  body = jsonencode({
-    properties = {
-      addressPrefix = var.aks_system_subnet_cidr
-      networkSecurityGroup = {
-        id = data.azurerm_network_security_group.existing.id
-      }
-      routeTable = {
-        id = data.azurerm_route_table.existing.id
-      }
-    }
-  })
-}
-
-# AKS API subnet using AzAPI (for API server vnet integration)
-resource "azapi_resource" "aks_api_subnet" {
-  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
-  name      = "snet-aks-api-${var.environment}-${var.region}-${var.sequence}"
-  parent_id = var.virtual_network_id
-
-  body = jsonencode({
-    properties = {
-      addressPrefix = var.aks_api_subnet_cidr
-      delegation = [{
-        name = "Microsoft.ContainerService/managedClusters"
-        properties = {
-          serviceName = "Microsoft.ContainerService/managedClusters"
-        }
-      }]
-      networkSecurityGroup = {
-        id = data.azurerm_network_security_group.existing.id
-      }
-      routeTable = {
-        id = data.azurerm_route_table.existing.id
-      }
-    }
-  })
-}
-
-# User apps subnet using AzAPI
-resource "azapi_resource" "aks_user_subnet" {
-  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
-  name      = "snet-aks-user-${var.environment}-${var.region}-${var.sequence}"
-  parent_id = var.virtual_network_id
-
-  body = jsonencode({
-    properties = {
-      addressPrefix = var.aks_user_subnet_cidr
-      networkSecurityGroup = {
-        id = data.azurerm_network_security_group.existing.id
-      }
-      routeTable = {
-        id = data.azurerm_route_table.existing.id
-      }
-    }
-  })
-}
-
-# VLLM workload subnet using AzAPI
-resource "azapi_resource" "aks_vllm_subnet" {
-  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
-  name      = "snet-aks-vllm-${var.environment}-${var.region}-${var.sequence}"
-  parent_id = var.virtual_network_id
-
-  body = jsonencode({
-    properties = {
-      addressPrefix = var.aks_vllm_subnet_cidr
-      networkSecurityGroup = {
-        id = data.azurerm_network_security_group.existing.id
-      }
-      routeTable = {
-        id = data.azurerm_route_table.existing.id
-      }
-    }
-  })
-}
-
-# Get existing NSG and Route Table
-data "azurerm_network_security_group" "existing" {
-  name                = "nsg-bain-dev-incp-uaen-001"
-  resource_group_name = "rg-network-dev-incp-uaen-001"
-}
-
-data "azurerm_route_table" "existing" {
-  name                = "rt-bain-dev-incp-uaen-001"
-  resource_group_name = "rg-network-dev-incp-uaen-001"
-}
 
 # User apps node pool
 resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
@@ -245,7 +148,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   vm_size              = var.user_vm_size
   node_count           = var.user_node_count
-  vnet_subnet_id       = azapi_resource.aks_user_subnet.id
+  vnet_subnet_id       = var.aks_subnet_id
   zones                = var.availability_zones
   enable_auto_scaling  = true
   min_count           = var.user_min_count
@@ -265,8 +168,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
   }
 
   tags = var.tags
-
-  depends_on = [azapi_resource.aks_user_subnet]
 }
 
 # VLLM workload node pool (normal VMs for now, will be updated to GPU later)
@@ -275,7 +176,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "vllm" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   vm_size              = var.vllm_vm_size
   node_count           = var.vllm_node_count
-  vnet_subnet_id       = azapi_resource.aks_vllm_subnet.id
+  vnet_subnet_id       = var.aks_subnet_id
   zones                = var.availability_zones
   enable_auto_scaling  = true
   min_count           = var.vllm_min_count
@@ -299,8 +200,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "vllm" {
   }
 
   tags = var.tags
-
-  depends_on = [azapi_resource.aks_vllm_subnet]
 }
 
 # Private endpoint for AKS

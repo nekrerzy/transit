@@ -104,14 +104,10 @@ module "aks" {
   
   resource_group_name         = azurerm_resource_group.main.name
   location                   = azurerm_resource_group.main.location
-  virtual_network_id         = var.virtual_network_id
   private_endpoint_subnet_id = var.private_endpoint_subnet_id
   private_dns_zone_id        = var.aks_private_dns_zone_id
   log_analytics_workspace_id = var.log_analytics_workspace_id
-  aks_system_subnet_cidr     = var.aks_system_subnet_cidr
-  aks_api_subnet_cidr        = var.aks_api_subnet_cidr
-  aks_user_subnet_cidr       = var.aks_user_subnet_cidr
-  aks_vllm_subnet_cidr       = var.aks_vllm_subnet_cidr
+  aks_subnet_id              = var.aks_subnet_id
   component                  = var.component
   environment                = var.environment
   region                     = var.region

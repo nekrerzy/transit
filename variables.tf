@@ -72,28 +72,9 @@ variable "log_analytics_workspace_id" {
   type        = string
 }
 
-variable "aks_system_subnet_cidr" {
-  description = "CIDR block for AKS system node pool subnet"
+variable "aks_subnet_id" {
+  description = "Existing AKS subnet ID for all node pools"
   type        = string
-  default     = "172.20.162.0/28"
-}
-
-variable "aks_api_subnet_cidr" {
-  description = "CIDR block for AKS API server subnet"
-  type        = string
-  default     = "172.20.163.0/28"
-}
-
-variable "aks_user_subnet_cidr" {
-  description = "CIDR block for AKS user apps node pool subnet"
-  type        = string
-  default     = "172.20.164.0/26"
-}
-
-variable "aks_vllm_subnet_cidr" {
-  description = "CIDR block for AKS VLLM node pool subnet"
-  type        = string
-  default     = "172.20.165.0/27"
 }
 
 variable "common_tags" {

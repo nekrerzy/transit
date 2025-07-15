@@ -55,24 +55,9 @@ output "vllm_node_pool_name" {
 }
 
 # Subnet Information
-output "aks_system_subnet_id" {
-  description = "ID of the AKS system subnet"
-  value       = azapi_resource.aks_system_subnet.id
-}
-
-output "aks_api_subnet_id" {
-  description = "ID of the AKS API subnet"
-  value       = azapi_resource.aks_api_subnet.id
-}
-
-output "aks_user_subnet_id" {
-  description = "ID of the AKS user apps subnet"
-  value       = azapi_resource.aks_user_subnet.id
-}
-
-output "aks_vllm_subnet_id" {
-  description = "ID of the AKS VLLM subnet"
-  value       = azapi_resource.aks_vllm_subnet.id
+output "aks_subnet_id" {
+  description = "ID of the AKS subnet used by all node pools"
+  value       = var.aks_subnet_id
 }
 
 # Security Information
