@@ -18,36 +18,46 @@ data "azurerm_route_table" "existing" {
   resource_group_name = var.network_resource_group_name
 }
 
-# Create PostgreSQL subnet with delegation
-resource "azurerm_subnet" "postgres" {
-  name                 = "SNET-POSTGRES"
-  resource_group_name  = var.network_resource_group_name
-  virtual_network_name = var.virtual_network_name
-  address_prefixes     = [var.postgres_subnet_cidr]
+# Create PostgreSQL subnet with delegation using AzAPI
+resource "azapi_resource" "postgres_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
+  name      = "SNET-POSTGRES"
+  parent_id = "/subscriptions/${var.subscription_id}/resourceGroups/${var.network_resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.virtual_network_name}"
 
-  delegation {
-    name = "postgres-delegation"
-
-    service_delegation {
-      name = "Microsoft.DBforPostgreSQL/flexibleServers"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
+  body = jsonencode({
+    properties = {
+      addressPrefixes = [var.postgres_subnet_cidr]
+      networkSecurityGroup = {
+        id = data.azurerm_network_security_group.existing.id
+      }
+      routeTable = {
+        id = data.azurerm_route_table.existing.id
+      }
+      delegations = [
+        {
+          name = "postgres-delegation"
+          properties = {
+            serviceName = "Microsoft.DBforPostgreSQL/flexibleServers"
+            actions = [
+              "Microsoft.Network/virtualNetworks/subnets/join/action"
+            ]
+          }
+        }
       ]
     }
-  }
+  })
 }
 
-# Associate existing NSG with subnet
-resource "azurerm_subnet_network_security_group_association" "postgres" {
-  subnet_id                 = azurerm_subnet.postgres.id
-  network_security_group_id = data.azurerm_network_security_group.existing.id
+# Data source to reference the created subnet for other resources
+data "azurerm_subnet" "postgres" {
+  name                 = "SNET-POSTGRES"
+  virtual_network_name = var.virtual_network_name
+  resource_group_name  = var.network_resource_group_name
+  
+  depends_on = [azapi_resource.postgres_subnet]
 }
 
-# Associate existing Route Table with subnet
-resource "azurerm_subnet_route_table_association" "postgres" {
-  subnet_id      = azurerm_subnet.postgres.id
-  route_table_id = data.azurerm_route_table.existing.id
-}
+# NSG and Route Table are already associated via AzAPI resource creation
 
 # Reference existing managed identity from security RG
 data "azurerm_user_assigned_identity" "existing" {
@@ -120,7 +130,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   }
 
   # Network configuration
-  delegated_subnet_id = azurerm_subnet.postgres.id
+  delegated_subnet_id = data.azurerm_subnet.postgres.id
   private_dns_zone_id = var.private_dns_zone_id
 
   # Maintenance window

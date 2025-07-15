@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.36"
     }
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.0"
+    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.6"
@@ -51,6 +55,7 @@ module "postgresql" {
   
   resource_group_name         = azurerm_resource_group.main.name
   location                   = azurerm_resource_group.main.location
+  subscription_id            = var.subscription_id
   postgres_subnet_cidr       = var.postgres_subnet_cidr
   private_endpoint_subnet_id = var.private_endpoint_subnet_id
   private_dns_zone_id        = var.postgresql_private_dns_zone_id

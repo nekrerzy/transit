@@ -66,6 +66,11 @@ variable "virtual_network_name" {
   default     = "vnet-bain-dev-incp-uaen-001"
 }
 
+variable "subscription_id" {
+  description = "Azure subscription ID"
+  type        = string
+}
+
 variable "postgres_subnet_cidr" {
   description = "CIDR block for PostgreSQL subnet"
   type        = string
