@@ -4,7 +4,7 @@
 subscription_id                   = "your-azure-subscription-id-here"
 private_endpoint_subnet_id        = "/subscriptions/your-sub-id/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/virtualNetworks/vnet-name/subnets/SNET-PE"
 virtual_network_id                = "/subscriptions/your-sub-id/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/virtualNetworks/vnet-name"
-postgres_subnet_cidr              = "10.0.4.0/24"
+postgres_subnet_cidr              = "172.20.161.0/28"
 postgresql_private_dns_zone_id    = "/subscriptions/your-sub-id/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/privateDnsZones/psql-bain-dev-incp-uaen-001.private.postgres.database.azure.com"
 postgresql_admin_password         = "YourSecurePassword123!"
 component                         = "app"

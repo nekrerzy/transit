@@ -45,7 +45,7 @@ variable "virtual_network_id" {
 variable "postgres_subnet_cidr" {
   description = "CIDR block for PostgreSQL subnet"
   type        = string
-  default     = "10.0.4.0/24"
+  default     = "172.20.161.0/28"
 }
 
 variable "postgresql_private_dns_zone_id" {
