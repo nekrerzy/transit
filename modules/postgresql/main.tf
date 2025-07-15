@@ -6,6 +6,18 @@ data "azurerm_key_vault" "existing" {
   resource_group_name = "rg-security-dev-incp-uaen-001"
 }
 
+# Reference existing Network Security Group
+data "azurerm_network_security_group" "existing" {
+  name                = "nsg-default-dev-incp-uaen-001"
+  resource_group_name = var.network_resource_group_name
+}
+
+# Reference existing Route Table
+data "azurerm_route_table" "existing" {
+  name                = "rt-default-dev-incp-uaen-001"
+  resource_group_name = var.network_resource_group_name
+}
+
 # Create PostgreSQL subnet with delegation
 resource "azurerm_subnet" "postgres" {
   name                 = "SNET-POSTGRES"
@@ -23,6 +35,18 @@ resource "azurerm_subnet" "postgres" {
       ]
     }
   }
+}
+
+# Associate existing NSG with subnet
+resource "azurerm_subnet_network_security_group_association" "postgres" {
+  subnet_id                 = azurerm_subnet.postgres.id
+  network_security_group_id = data.azurerm_network_security_group.existing.id
+}
+
+# Associate existing Route Table with subnet
+resource "azurerm_subnet_route_table_association" "postgres" {
+  subnet_id      = azurerm_subnet.postgres.id
+  route_table_id = data.azurerm_route_table.existing.id
 }
 
 # Reference existing managed identity from security RG
