@@ -58,9 +58,22 @@ variable "standby_availability_zone" {
   default     = "2"
 }
 
-variable "delegated_subnet_id" {
-  description = "Subnet ID for PostgreSQL delegation"
+variable "network_resource_group_name" {
+  description = "Network resource group name"
   type        = string
+  default     = "rg-network-dev-incp-uaen-001"
+}
+
+variable "virtual_network_name" {
+  description = "Virtual network name"
+  type        = string
+  default     = "vnet-bain-dev-incp-uaen-001"
+}
+
+variable "postgres_subnet_cidr" {
+  description = "CIDR block for PostgreSQL subnet"
+  type        = string
+  default     = "10.0.4.0/24"
 }
 
 variable "private_endpoint_subnet_id" {

@@ -42,9 +42,10 @@ variable "virtual_network_id" {
   type        = string
 }
 
-variable "postgresql_delegated_subnet_id" {
-  description = "Subnet ID for PostgreSQL delegation"
+variable "postgres_subnet_cidr" {
+  description = "CIDR block for PostgreSQL subnet"
   type        = string
+  default     = "10.0.4.0/24"
 }
 
 variable "postgresql_private_dns_zone_id" {

@@ -6,6 +6,25 @@ data "azurerm_key_vault" "existing" {
   resource_group_name = "rg-security-dev-incp-uaen-001"
 }
 
+# Create PostgreSQL subnet with delegation
+resource "azurerm_subnet" "postgres" {
+  name                 = "SNET-POSTGRES"
+  resource_group_name  = var.network_resource_group_name
+  virtual_network_name = var.virtual_network_name
+  address_prefixes     = [var.postgres_subnet_cidr]
+
+  delegation {
+    name = "postgres-delegation"
+
+    service_delegation {
+      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+
 # Reference existing managed identity from security RG
 data "azurerm_user_assigned_identity" "existing" {
   name                = "id-storage-cmk-dev-incp-uaen-001"
@@ -68,7 +87,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   }
 
   # Network configuration
-  delegated_subnet_id = var.delegated_subnet_id
+  delegated_subnet_id = azurerm_subnet.postgres.id
   private_dns_zone_id = var.private_dns_zone_id
 
   # Maintenance window
