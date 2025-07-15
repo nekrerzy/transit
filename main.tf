@@ -33,12 +33,13 @@ resource "azurerm_resource_group" "main" {
 module "storage_account" {
   source = "./modules/storage"
   
-  resource_group_name = azurerm_resource_group.main.name
-  location           = azurerm_resource_group.main.location
-  component          = var.component
-  environment        = var.environment
-  region             = var.region
-  sequence           = var.sequence
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
   
   tags = var.common_tags
 }

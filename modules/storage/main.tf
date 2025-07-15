@@ -21,11 +21,11 @@ resource "azurerm_key_vault" "storage_kv" {
   purge_protection_enabled        = true
   soft_delete_retention_days      = 7
 
-  public_network_access_enabled = true
+  public_network_access_enabled = false
   enable_rbac_authorization     = true
 
   network_acls {
-    default_action = "Allow"
+    default_action = "Deny"
     bypass         = "AzureServices"
   }
 
@@ -123,8 +123,6 @@ resource "azurerm_private_endpoint" "storage_blob" {
   }
 
   tags = var.tags
-
-  count = var.private_endpoint_subnet_id != null ? 1 : 0
 }
 
 # Private endpoint for Key Vault
@@ -142,6 +140,4 @@ resource "azurerm_private_endpoint" "kv" {
   }
 
   tags = var.tags
-
-  count = var.private_endpoint_subnet_id != null ? 1 : 0
 }

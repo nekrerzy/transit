@@ -35,7 +35,6 @@ variable "tags" {
 }
 
 variable "private_endpoint_subnet_id" {
-  description = "Subnet ID for private endpoints (optional)"
+  description = "Subnet ID for private endpoints (required for this security model)"
   type        = string
-  default     = null
 }

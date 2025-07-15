@@ -32,6 +32,11 @@ variable "subscription_id" {
   type        = string
 }
 
+variable "private_endpoint_subnet_id" {
+  description = "Subnet ID for private endpoints (required due to security policies)"
+  type        = string
+}
+
 variable "location" {
   description = "Azure region"
   type        = string

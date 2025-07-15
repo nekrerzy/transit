@@ -1,12 +1,13 @@
 # Example terraform.tfvars file
 # Copy this to terraform.tfvars and customize for your environment
 
-subscription_id = "your-azure-subscription-id-here"
-component       = "app"
-environment     = "dev"
-region          = "uaen" 
-sequence        = "001"
-location        = "UAE North"
+subscription_id            = "your-azure-subscription-id-here"
+private_endpoint_subnet_id = "/subscriptions/your-sub-id/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/virtualNetworks/vnet-name/subnets/subnet-name"
+component                  = "app"
+environment                = "dev"
+region                     = "uaen" 
+sequence                   = "001"
+location                   = "UAE North"
 
 common_tags = {
   Environment = "dev"
