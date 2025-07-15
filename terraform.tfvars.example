@@ -7,6 +7,14 @@ virtual_network_id                = "/subscriptions/b65e6929-28d1-4b59-88f3-570a
 postgres_subnet_cidr              = "172.20.161.0/28"
 postgresql_private_dns_zone_id    = "/subscriptions/b65e6929-28d1-4b59-88f3-570a0df91662/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/privateDnsZones/psql-bain-dev-incp-uaen-001.private.postgres.database.azure.com"
 # postgresql_admin_password auto-generated as random 24-character password
+
+# AKS Configuration
+aks_private_dns_zone_id       = "/subscriptions/b65e6929-28d1-4b59-88f3-570a0df91662/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/privateDnsZones/aks-bain-dev-incp-uaen-002.privatelink.uaenorth.azmk8s.io"
+log_analytics_workspace_id    = "/subscriptions/b65e6929-28d1-4b59-88f3-570a0df91662/resourceGroups/rg-monitoring-dev-incp-uaen-001/providers/Microsoft.OperationalInsights/workspaces/law-bain-dev-incp-uaen-001"
+aks_system_subnet_cidr        = "172.20.162.0/28"
+aks_api_subnet_cidr           = "172.20.163.0/28"
+aks_user_subnet_cidr          = "172.20.164.0/26"
+aks_vllm_subnet_cidr          = "172.20.165.0/27"
 component                         = "app"
 environment                       = "dev"
 region                            = "uaen" 

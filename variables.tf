@@ -61,6 +61,41 @@ variable "location" {
   default     = "UAE North"
 }
 
+# AKS Configuration
+variable "aks_private_dns_zone_id" {
+  description = "Private DNS zone ID for AKS private cluster"
+  type        = string
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Log Analytics workspace ID for AKS monitoring"
+  type        = string
+}
+
+variable "aks_system_subnet_cidr" {
+  description = "CIDR block for AKS system node pool subnet"
+  type        = string
+  default     = "172.20.162.0/28"
+}
+
+variable "aks_api_subnet_cidr" {
+  description = "CIDR block for AKS API server subnet"
+  type        = string
+  default     = "172.20.163.0/28"
+}
+
+variable "aks_user_subnet_cidr" {
+  description = "CIDR block for AKS user apps node pool subnet"
+  type        = string
+  default     = "172.20.164.0/26"
+}
+
+variable "aks_vllm_subnet_cidr" {
+  description = "CIDR block for AKS VLLM node pool subnet"
+  type        = string
+  default     = "172.20.165.0/27"
+}
+
 variable "common_tags" {
   description = "Common tags for all resources"
   type        = map(string)

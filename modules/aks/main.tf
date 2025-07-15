@@ -1,0 +1,321 @@
+# AKS cluster with enterprise security
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = "aks-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  dns_prefix          = "aks-bain-${var.component}-${var.environment}-${var.region}-${var.sequence}"
+  kubernetes_version  = var.kubernetes_version
+
+  # Private cluster configuration
+  private_cluster_enabled             = true
+  private_dns_zone_id                = var.private_dns_zone_id
+  private_cluster_public_fqdn_enabled = false
+
+  # Network configuration
+  network_profile {
+    network_plugin      = "azure"
+    network_policy      = "azure"
+    dns_service_ip      = var.dns_service_ip
+    service_cidr        = var.service_cidr
+    outbound_type      = "userDefinedRouting"
+  }
+
+  # Default system node pool (will be replaced by dedicated system pool)
+  default_node_pool {
+    name                = "system"
+    node_count          = var.system_node_count
+    vm_size             = var.system_vm_size
+    vnet_subnet_id      = azapi_resource.aks_system_subnet.id
+    zones               = var.availability_zones
+    enable_auto_scaling = true
+    min_count          = var.system_min_count
+    max_count          = var.system_max_count
+    max_pods           = 30
+    os_disk_size_gb    = 128
+    os_disk_type       = "Managed"
+    only_critical_addons_enabled = true
+
+    # Node pool taints for system workloads
+    node_taints = ["CriticalAddonsOnly=true:NoSchedule"]
+
+    upgrade_settings {
+      max_surge = "33%"
+    }
+  }
+
+  # Identity configuration
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [data.azurerm_user_assigned_identity.existing.id]
+  }
+
+  # Disk encryption using existing CMK
+  disk_encryption_set_id = azurerm_disk_encryption_set.aks.id
+
+  # API server access profile for private cluster
+  api_server_access_profile {
+    vnet_integration_enabled = true
+    subnet_id               = azapi_resource.aks_api_subnet.id
+  }
+
+  # Auto scaler profile
+  auto_scaler_profile {
+    balance_similar_node_groups      = false
+    expander                        = "random"
+    max_node_provisioning_time      = "15m"
+    max_unready_nodes              = 3
+    max_unready_percentage         = 45
+    new_pod_scale_up_delay         = "10s"
+    scale_down_delay_after_add     = "10m"
+    scale_down_delay_after_delete  = "10s"
+    scale_down_delay_after_failure = "3m"
+    scan_interval                  = "10s"
+    scale_down_unneeded           = "10m"
+    scale_down_unready            = "20m"
+    scale_down_utilization_threshold = 0.5
+  }
+
+  # Azure Policy add-on
+  azure_policy_enabled = true
+
+  # OMS agent for monitoring
+  oms_agent {
+    log_analytics_workspace_id      = var.log_analytics_workspace_id
+    msi_auth_for_monitoring_enabled = true
+  }
+
+  # Key Vault secrets provider
+  key_vault_secrets_provider {
+    secret_rotation_enabled  = true
+    secret_rotation_interval = "2m"
+  }
+
+  # Workload identity
+  workload_identity_enabled = true
+  oidc_issuer_enabled      = true
+
+  tags = var.tags
+
+  depends_on = [
+    azapi_resource.aks_system_subnet,
+    azapi_resource.aks_api_subnet
+  ]
+}
+
+# Reference existing Key Vault from security RG
+data "azurerm_key_vault" "existing" {
+  name                = "kv-bain-dev-incp-uaen-01"
+  resource_group_name = "rg-security-dev-incp-uaen-001"
+}
+
+# Reference existing managed identity from security RG
+data "azurerm_user_assigned_identity" "existing" {
+  name                = "id-storage-cmk-dev-incp-uaen-001"
+  resource_group_name = "rg-security-dev-incp-uaen-001"
+}
+
+# Key for AKS disk encryption in existing Key Vault
+resource "azurerm_key_vault_key" "aks_key" {
+  name         = "key-aks-${var.component}-${var.environment}-${var.sequence}"
+  key_vault_id = data.azurerm_key_vault.existing.id
+  key_type     = "RSA"
+  key_size     = 2048
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+}
+
+# Disk encryption set for AKS
+resource "azurerm_disk_encryption_set" "aks" {
+  name                = "des-aks-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  key_vault_key_id    = azurerm_key_vault_key.aks_key.id
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [data.azurerm_user_assigned_identity.existing.id]
+  }
+
+  tags = var.tags
+}
+
+# AKS System subnet using AzAPI (to bypass NSG/UDR policies)
+resource "azapi_resource" "aks_system_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
+  name      = "snet-aks-system-${var.environment}-${var.region}-${var.sequence}"
+  parent_id = var.virtual_network_id
+
+  body = jsonencode({
+    properties = {
+      addressPrefix = var.aks_system_subnet_cidr
+      networkSecurityGroup = {
+        id = data.azurerm_network_security_group.existing.id
+      }
+      routeTable = {
+        id = data.azurerm_route_table.existing.id
+      }
+    }
+  })
+}
+
+# AKS API subnet using AzAPI (for API server vnet integration)
+resource "azapi_resource" "aks_api_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
+  name      = "snet-aks-api-${var.environment}-${var.region}-${var.sequence}"
+  parent_id = var.virtual_network_id
+
+  body = jsonencode({
+    properties = {
+      addressPrefix = var.aks_api_subnet_cidr
+      delegation = [{
+        name = "Microsoft.ContainerService/managedClusters"
+        properties = {
+          serviceName = "Microsoft.ContainerService/managedClusters"
+        }
+      }]
+      networkSecurityGroup = {
+        id = data.azurerm_network_security_group.existing.id
+      }
+      routeTable = {
+        id = data.azurerm_route_table.existing.id
+      }
+    }
+  })
+}
+
+# User apps subnet using AzAPI
+resource "azapi_resource" "aks_user_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
+  name      = "snet-aks-user-${var.environment}-${var.region}-${var.sequence}"
+  parent_id = var.virtual_network_id
+
+  body = jsonencode({
+    properties = {
+      addressPrefix = var.aks_user_subnet_cidr
+      networkSecurityGroup = {
+        id = data.azurerm_network_security_group.existing.id
+      }
+      routeTable = {
+        id = data.azurerm_route_table.existing.id
+      }
+    }
+  })
+}
+
+# VLLM workload subnet using AzAPI
+resource "azapi_resource" "aks_vllm_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2023-06-01"
+  name      = "snet-aks-vllm-${var.environment}-${var.region}-${var.sequence}"
+  parent_id = var.virtual_network_id
+
+  body = jsonencode({
+    properties = {
+      addressPrefix = var.aks_vllm_subnet_cidr
+      networkSecurityGroup = {
+        id = data.azurerm_network_security_group.existing.id
+      }
+      routeTable = {
+        id = data.azurerm_route_table.existing.id
+      }
+    }
+  })
+}
+
+# Get existing NSG and Route Table
+data "azurerm_network_security_group" "existing" {
+  name                = "nsg-bain-dev-incp-uaen-001"
+  resource_group_name = "rg-network-dev-incp-uaen-001"
+}
+
+data "azurerm_route_table" "existing" {
+  name                = "rt-bain-dev-incp-uaen-001"
+  resource_group_name = "rg-network-dev-incp-uaen-001"
+}
+
+# User apps node pool
+resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
+  name                  = "userapps"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  vm_size              = var.user_vm_size
+  node_count           = var.user_node_count
+  vnet_subnet_id       = azapi_resource.aks_user_subnet.id
+  zones                = var.availability_zones
+  enable_auto_scaling  = true
+  min_count           = var.user_min_count
+  max_count           = var.user_max_count
+  max_pods            = 110
+  os_disk_size_gb     = 128
+  os_disk_type        = "Managed"
+
+  # Node labels for workload targeting
+  node_labels = {
+    "workload-type" = "user-apps"
+    "pool-name"     = "userapps"
+  }
+
+  upgrade_settings {
+    max_surge = "33%"
+  }
+
+  tags = var.tags
+
+  depends_on = [azapi_resource.aks_user_subnet]
+}
+
+# VLLM workload node pool (normal VMs for now, will be updated to GPU later)
+resource "azurerm_kubernetes_cluster_node_pool" "vllm" {
+  name                  = "vllm"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  vm_size              = var.vllm_vm_size
+  node_count           = var.vllm_node_count
+  vnet_subnet_id       = azapi_resource.aks_vllm_subnet.id
+  zones                = var.availability_zones
+  enable_auto_scaling  = true
+  min_count           = var.vllm_min_count
+  max_count           = var.vllm_max_count
+  max_pods            = 30
+  os_disk_size_gb     = 256
+  os_disk_type        = "Managed"
+
+  # Node labels and taints for ML workloads
+  node_labels = {
+    "workload-type" = "ml-inference"
+    "pool-name"     = "vllm"
+    "accelerator"   = "none"  # Will be updated to "gpu" later
+  }
+
+  # Taint to ensure only ML workloads are scheduled here
+  node_taints = ["workload-type=ml-inference:NoSchedule"]
+
+  upgrade_settings {
+    max_surge = "33%"
+  }
+
+  tags = var.tags
+
+  depends_on = [azapi_resource.aks_vllm_subnet]
+}
+
+# Private endpoint for AKS
+resource "azurerm_private_endpoint" "aks" {
+  name                = "pe-${azurerm_kubernetes_cluster.aks.name}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.private_endpoint_subnet_id
+
+  private_service_connection {
+    name                           = "psc-${azurerm_kubernetes_cluster.aks.name}"
+    private_connection_resource_id = azurerm_kubernetes_cluster.aks.id
+    subresource_names              = ["management"]
+    is_manual_connection           = false
+  }
+
+  tags = var.tags
+}
