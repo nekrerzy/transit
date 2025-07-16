@@ -29,7 +29,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     network_policy      = "azure"
     dns_service_ip      = var.dns_service_ip
     service_cidr        = var.service_cidr
-    outbound_type      = "loadBalancer"
+    outbound_type      = "userDefinedRouting"
   }
 
   # Default system node pool
