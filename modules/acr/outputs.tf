@@ -29,13 +29,13 @@ output "private_endpoint_ip" {
 }
 
 output "private_dns_zone_id" {
-  description = "ID of the private DNS zone"
-  value       = data.azurerm_private_dns_zone.acr.id
+  description = "ID of the private DNS zone (managed by Azure Policy)"
+  value       = null
 }
 
 output "private_dns_zone_name" {
-  description = "Name of the private DNS zone"
-  value       = data.azurerm_private_dns_zone.acr.name
+  description = "Name of the private DNS zone (managed by Azure Policy)"
+  value       = "privatelink.azurecr.io"
 }
 
 output "key_vault_id" {

@@ -82,19 +82,16 @@ resource "azurerm_private_endpoint" "acr" {
     subresource_names              = ["registry"]
   }
 
-  private_dns_zone_group {
-    name                 = "dns-zone-group"
-    private_dns_zone_ids = [data.azurerm_private_dns_zone.acr.id]
-  }
+  # Private DNS zone group will be managed by Azure Policy
+  # private_dns_zone_group {
+  #   name                 = "dns-zone-group"
+  #   private_dns_zone_ids = [data.azurerm_private_dns_zone.acr.id]
+  # }
 
   tags = var.tags
 }
 
-# Reference existing private DNS zone for ACR (created by network team)
-data "azurerm_private_dns_zone" "acr" {
-  name                = "privatelink.azurecr.io"
-  resource_group_name = var.network_resource_group_name
-}
+# Private DNS zone will be managed by Azure Policy automatically
 
 # Diagnostic settings for ACR
 resource "azurerm_monitor_diagnostic_setting" "acr" {
