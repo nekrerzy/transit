@@ -162,6 +162,9 @@ module "acr" {
   region                     = var.region
   sequence                   = var.sequence
   
+  # Optional: Enable diagnostics with Log Analytics
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+  
   tags = var.common_tags
 }
 
