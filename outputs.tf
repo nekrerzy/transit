@@ -77,29 +77,31 @@ output "redis_primary_access_key" {
 }
 
 # Key Vault outputs
-output "keyvault_id" {
-  description = "ID of the Key Vault"
-  value       = module.keyvault.key_vault_id
+output "key_vaults" {
+  description = "Map of all created Key Vaults with their details"
+  value = {
+    for purpose, vault in module.key_vaults : purpose => {
+      id          = vault.key_vault_id
+      name        = vault.key_vault_name
+      uri         = vault.key_vault_uri
+      private_ip  = vault.private_endpoint_ip
+      application_key_id = vault.application_key_id
+    }
+  }
 }
 
-output "keyvault_name" {
-  description = "Name of the Key Vault"
-  value       = module.keyvault.key_vault_name
+output "key_vault_names" {
+  description = "Names of all created Key Vaults"
+  value = {
+    for purpose, vault in module.key_vaults : purpose => vault.key_vault_name
+  }
 }
 
-output "keyvault_uri" {
-  description = "URI of the Key Vault"
-  value       = module.keyvault.key_vault_uri
-}
-
-output "keyvault_private_ip" {
-  description = "Private IP address of the Key Vault"
-  value       = module.keyvault.private_endpoint_ip
-}
-
-output "keyvault_application_key_id" {
-  description = "ID of the application encryption key"
-  value       = module.keyvault.application_key_id
+output "key_vault_uris" {
+  description = "URIs of all created Key Vaults"
+  value = {
+    for purpose, vault in module.key_vaults : purpose => vault.key_vault_uri
+  }
 }
 
 # AKS outputs - COMMENTED OUT (module disabled due to firewall configuration issue)

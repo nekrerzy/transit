@@ -106,9 +106,11 @@ module "redis" {
   tags = var.common_tags
 }
 
-# Key Vault module
-module "keyvault" {
+# Key Vaults for different purposes
+module "key_vaults" {
   source = "./modules/keyvault"
+  
+  for_each = var.key_vaults
   
   resource_group_name         = azurerm_resource_group.main.name
   location                   = azurerm_resource_group.main.location
@@ -118,7 +120,15 @@ module "keyvault" {
   region                     = var.region
   sequence                   = var.sequence
   
-  tags = var.common_tags
+  # Override purpose for naming
+  kv_purpose = each.key
+  sku_name = each.value.sku_name
+  create_application_key = each.value.create_application_key
+  
+  tags = merge(var.common_tags, {
+    Purpose = each.value.purpose
+    KeyVaultType = each.key
+  })
 }
 
 # AKS module - COMMENTED OUT DUE TO AZURE FIREWALL CONFIGURATION ISSUE

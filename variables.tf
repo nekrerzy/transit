@@ -109,3 +109,29 @@ variable "storage_accounts" {
     }
   }
 }
+
+variable "key_vaults" {
+  description = "Map of Key Vaults to create with different purposes"
+  type = map(object({
+    purpose                   = string
+    sku_name                 = optional(string, "premium")
+    create_application_key   = optional(bool, false)
+  }))
+  default = {
+    app-secrets = {
+      purpose                 = "Application secrets and configurations"
+      sku_name               = "premium"
+      create_application_key = false
+    }
+    ai-keys = {
+      purpose                 = "AI/ML model keys and tokens"
+      sku_name               = "premium"
+      create_application_key = false
+    }
+    certificates = {
+      purpose                 = "SSL certificates and PKI"
+      sku_name               = "premium"
+      create_application_key = false
+    }
+  }
+}

@@ -45,3 +45,27 @@ common_tags = {
 #     data_type = "Backup"
 #   }
 # }
+
+# Key Vaults configuration - customize as needed
+# key_vaults = {
+#   app-secrets = {
+#     purpose                 = "Application secrets and configurations"
+#     sku_name               = "premium"
+#     create_application_key = false
+#   }
+#   ai-keys = {
+#     purpose                 = "AI/ML model keys and tokens"
+#     sku_name               = "premium"
+#     create_application_key = false
+#   }
+#   certificates = {
+#     purpose                 = "SSL certificates and PKI"
+#     sku_name               = "premium"
+#     create_application_key = false
+#   }
+#   devops = {
+#     purpose                 = "CI/CD and infrastructure secrets"
+#     sku_name               = "standard"
+#     create_application_key = true
+#   }
+# }

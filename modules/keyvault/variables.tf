@@ -83,3 +83,9 @@ variable "additional_rbac_assignments" {
   }))
   default = {}
 }
+
+variable "kv_purpose" {
+  description = "Purpose identifier for Key Vault naming (e.g., app-secrets, ai-keys, certificates)"
+  type        = string
+  default     = "general"
+}
