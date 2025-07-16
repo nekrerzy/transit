@@ -11,7 +11,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # Private cluster configuration
   private_cluster_enabled             = true
-  private_dns_zone_id                = var.private_dns_zone_id
+  # private_dns_zone_id                = var.private_dns_zone_id  # Let Azure Policy manage
   private_cluster_public_fqdn_enabled = false
 
   # Azure AD integration (required for disabling local accounts)
