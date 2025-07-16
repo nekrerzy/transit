@@ -79,14 +79,14 @@ variable "aks_subnet_id" {
 variable "availability_zones" {
   description = "Availability zones for node pools"
   type        = list(string)
-  default     = ["1", "3"]
+  default     = ["1", "2", "3"]
 }
 
 # System Node Pool Configuration
 variable "system_min_count" {
   description = "Minimum number of nodes in system pool"
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "system_max_count" {
@@ -105,7 +105,7 @@ variable "system_vm_size" {
 variable "user_min_count" {
   description = "Minimum number of nodes in user apps pool"
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "user_max_count" {
