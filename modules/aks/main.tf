@@ -29,6 +29,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     vm_size                      = var.system_vm_size
     vnet_subnet_id               = var.aks_subnet_id
     zones                        = var.availability_zones
+    type                         = "VirtualMachineScaleSets"  # Required for zone redundancy
     auto_scaling_enabled         = true
     min_count                    = var.system_min_count
     max_count                    = var.system_max_count
