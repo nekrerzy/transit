@@ -83,12 +83,6 @@ variable "availability_zones" {
 }
 
 # System Node Pool Configuration
-variable "system_node_count" {
-  description = "Initial number of nodes in system pool"
-  type        = number
-  default     = 2
-}
-
 variable "system_min_count" {
   description = "Minimum number of nodes in system pool"
   type        = number
@@ -108,12 +102,6 @@ variable "system_vm_size" {
 }
 
 # User Apps Node Pool Configuration
-variable "user_node_count" {
-  description = "Initial number of nodes in user apps pool"
-  type        = number
-  default     = 2
-}
-
 variable "user_min_count" {
   description = "Minimum number of nodes in user apps pool"
   type        = number
@@ -133,12 +121,6 @@ variable "user_vm_size" {
 }
 
 # VLLM Node Pool Configuration
-variable "vllm_node_count" {
-  description = "Initial number of nodes in VLLM pool"
-  type        = number
-  default     = 1
-}
-
 variable "vllm_min_count" {
   description = "Minimum number of nodes in VLLM pool"
   type        = number

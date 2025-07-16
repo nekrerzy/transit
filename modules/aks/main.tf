@@ -22,21 +22,17 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   # Default system node pool
   default_node_pool {
-    name                = "system"
-    node_count          = var.system_node_count
-    vm_size             = var.system_vm_size
-    vnet_subnet_id      = var.aks_subnet_id
-    zones               = var.availability_zones
-    enable_auto_scaling = true
-    min_count          = var.system_min_count
-    max_count          = var.system_max_count
-    max_pods           = 30
-    os_disk_size_gb    = 128
-    os_disk_type       = "Managed"
+    name                         = "system"
+    vm_size                      = var.system_vm_size
+    vnet_subnet_id               = var.aks_subnet_id
+    zones                        = var.availability_zones
+    enable_auto_scaling          = true
+    min_count                    = var.system_min_count
+    max_count                    = var.system_max_count
+    max_pods                     = 30
+    os_disk_size_gb              = 128
+    os_disk_type                 = "Managed"
     only_critical_addons_enabled = true
-
-    # Node pool taints for system workloads
-    node_taints = ["CriticalAddonsOnly=true:NoSchedule"]
 
     upgrade_settings {
       max_surge = "33%"
@@ -55,7 +51,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   # API server access profile for private cluster
   api_server_access_profile {
     vnet_integration_enabled = true
-    subnet_id               = var.aks_subnet_id
+    subnet_id                = var.aks_subnet_id
   }
 
   # Auto scaler profile
@@ -147,7 +143,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
   name                  = "userapps"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   vm_size              = var.user_vm_size
-  node_count           = var.user_node_count
   vnet_subnet_id       = var.aks_subnet_id
   zones                = var.availability_zones
   enable_auto_scaling  = true
@@ -175,7 +170,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "vllm" {
   name                  = "vllm"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   vm_size              = var.vllm_vm_size
-  node_count           = var.vllm_node_count
   vnet_subnet_id       = var.aks_subnet_id
   zones                = var.availability_zones
   enable_auto_scaling  = true
