@@ -11,10 +11,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   private_dns_zone_id                = var.private_dns_zone_id
   private_cluster_public_fqdn_enabled = false
 
-  # API server vnet integration (new syntax for v4.x)
-  api_server_vnet_integration_enabled = true
-  api_server_subnet_id               = var.aks_subnet_id
-
   # Network configuration
   network_profile {
     network_plugin      = "azure"
