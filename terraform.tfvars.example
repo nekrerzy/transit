@@ -48,22 +48,22 @@ common_tags = {
 
 # Key Vaults configuration - customize as needed
 # key_vaults = {
-#   app-secrets = {
+#   app = {
 #     purpose                 = "Application secrets and configurations"
 #     sku_name               = "premium"
 #     create_application_key = false
 #   }
-#   ai-keys = {
+#   ai = {
 #     purpose                 = "AI/ML model keys and tokens"
 #     sku_name               = "premium"
 #     create_application_key = false
 #   }
-#   certificates = {
+#   cert = {
 #     purpose                 = "SSL certificates and PKI"
 #     sku_name               = "premium"
 #     create_application_key = false
 #   }
-#   devops = {
+#   ops = {
 #     purpose                 = "CI/CD and infrastructure secrets"
 #     sku_name               = "standard"
 #     create_application_key = true

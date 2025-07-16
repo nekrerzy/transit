@@ -118,17 +118,17 @@ variable "key_vaults" {
     create_application_key   = optional(bool, false)
   }))
   default = {
-    app-secrets = {
+    app = {
       purpose                 = "Application secrets and configurations"
       sku_name               = "premium"
       create_application_key = false
     }
-    ai-keys = {
+    ai = {
       purpose                 = "AI/ML model keys and tokens"
       sku_name               = "premium"
       create_application_key = false
     }
-    certificates = {
+    cert = {
       purpose                 = "SSL certificates and PKI"
       sku_name               = "premium"
       create_application_key = false
