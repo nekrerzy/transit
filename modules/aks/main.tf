@@ -1,3 +1,6 @@
+# Get current Azure client configuration
+data "azurerm_client_config" "current" {}
+
 # AKS cluster with enterprise security
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = "aks-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
@@ -14,6 +17,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   # Azure AD integration (required for disabling local accounts)
   azure_active_directory_role_based_access_control {
     azure_rbac_enabled = true
+    tenant_id          = data.azurerm_client_config.current.tenant_id
   }
 
   # Disable local authentication for policy compliance
