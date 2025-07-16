@@ -15,7 +15,7 @@ aks_subnet_id                 = "/subscriptions/b65e6929-28d1-4b59-88f3-570a0df9
 component                         = "app"
 environment                       = "dev"
 region                            = "uaen" 
-sequence                          = "002"
+sequence                          = "001"
 location                          = "UAE North"
 
 common_tags = {
