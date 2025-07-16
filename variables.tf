@@ -63,9 +63,9 @@ variable "location" {
 
 # AKS Configuration
 variable "aks_private_dns_zone_id" {
-  description = "Private DNS zone ID for AKS private cluster. Use 'System' to let AKS manage it automatically, or provide a custom private DNS zone ID"
+  description = "Private DNS zone ID for AKS private cluster. Use 'None' for fully private cluster in hub-and-spoke architecture"
   type        = string
-  default     = "System"
+  default     = "None"
 }
 
 variable "log_analytics_workspace_id" {
