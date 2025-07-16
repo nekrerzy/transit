@@ -68,71 +68,71 @@ output "redis_primary_access_key" {
   sensitive   = true
 }
 
-# AKS outputs
-output "aks_cluster_name" {
-  description = "Name of the AKS cluster"
-  value       = module.aks.aks_cluster_name
-}
-
-output "aks_cluster_fqdn" {
-  description = "FQDN of the AKS cluster"
-  value       = module.aks.aks_cluster_fqdn
-}
-
-output "aks_cluster_private_fqdn" {
-  description = "Private FQDN of the AKS cluster"
-  value       = module.aks.aks_cluster_private_fqdn
-}
-
-output "aks_kube_config" {
-  description = "Kubernetes configuration for the AKS cluster"
-  value       = module.aks.aks_kube_config
-  sensitive   = true
-}
-
-output "aks_oidc_issuer_url" {
-  description = "OIDC issuer URL for workload identity"
-  value       = module.aks.aks_oidc_issuer_url
-}
-
-output "system_node_pool_name" {
-  description = "Name of the system node pool"
-  value       = module.aks.system_node_pool_name
-}
-
-output "user_apps_node_pool_name" {
-  description = "Name of the user apps node pool"
-  value       = module.aks.user_apps_node_pool_name
-}
-
-output "vllm_node_pool_name" {
-  description = "Name of the VLLM node pool"
-  value       = module.aks.vllm_node_pool_name
-}
-
-# Azure OpenAI outputs - COMMENTED OUT (module disabled due to NSP restrictions)
-# output "openai_account_name" {
-#   description = "Name of the Azure OpenAI account"
-#   value       = module.openai.openai_account_name
+# AKS outputs - COMMENTED OUT (module disabled due to firewall configuration issue)
+# output "aks_cluster_name" {
+#   description = "Name of the AKS cluster"
+#   value       = module.aks.aks_cluster_name
 # }
 
-# output "openai_endpoint" {
-#   description = "Endpoint URL for Azure OpenAI"
-#   value       = module.openai.openai_endpoint
+# output "aks_cluster_fqdn" {
+#   description = "FQDN of the AKS cluster"
+#   value       = module.aks.aks_cluster_fqdn
 # }
 
-# output "openai_primary_access_key" {
-#   description = "Primary access key for Azure OpenAI"
-#   value       = module.openai.openai_primary_access_key
+# output "aks_cluster_private_fqdn" {
+#   description = "Private FQDN of the AKS cluster"
+#   value       = module.aks.aks_cluster_private_fqdn
+# }
+
+# output "aks_kube_config" {
+#   description = "Kubernetes configuration for the AKS cluster"
+#   value       = module.aks.aks_kube_config
 #   sensitive   = true
 # }
 
-# output "gpt41_deployment_name" {
-#   description = "Name of the GPT-4.1 deployment"
-#   value       = module.openai.gpt41_deployment_name
+# output "aks_oidc_issuer_url" {
+#   description = "OIDC issuer URL for workload identity"
+#   value       = module.aks.aks_oidc_issuer_url
 # }
 
-# output "embedding_deployment_name" {
-#   description = "Name of the text embedding deployment"
-#   value       = module.openai.embedding_deployment_name
+# output "system_node_pool_name" {
+#   description = "Name of the system node pool"
+#   value       = module.aks.system_node_pool_name
 # }
+
+# output "user_apps_node_pool_name" {
+#   description = "Name of the user apps node pool"
+#   value       = module.aks.user_apps_node_pool_name
+# }
+
+# output "vllm_node_pool_name" {
+#   description = "Name of the VLLM node pool"
+#   value       = module.aks.vllm_node_pool_name
+# }
+
+# Azure OpenAI outputs - TESTING IF NSP RESTRICTIONS HAVE BEEN RESOLVED
+output "openai_account_name" {
+  description = "Name of the Azure OpenAI account"
+  value       = module.openai.openai_account_name
+}
+
+output "openai_endpoint" {
+  description = "Endpoint URL for Azure OpenAI"
+  value       = module.openai.openai_endpoint
+}
+
+output "openai_primary_access_key" {
+  description = "Primary access key for Azure OpenAI"
+  value       = module.openai.openai_primary_access_key
+  sensitive   = true
+}
+
+output "gpt41_deployment_name" {
+  description = "Name of the GPT-4.1 deployment"
+  value       = module.openai.gpt41_deployment_name
+}
+
+output "embedding_deployment_name" {
+  description = "Name of the text embedding deployment"
+  value       = module.openai.embedding_deployment_name
+}

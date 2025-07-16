@@ -98,34 +98,20 @@ module "redis" {
   tags = var.common_tags
 }
 
-# AKS module
-module "aks" {
-  source = "./modules/aks"
-  
-  resource_group_name         = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  private_dns_zone_id        = var.aks_private_dns_zone_id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-  aks_subnet_id              = var.aks_subnet_id
-  component                  = var.component
-  environment                = var.environment
-  region                     = var.region
-  sequence                   = var.sequence
-  
-  tags = var.common_tags
-}
-
-# Azure OpenAI module - COMMENTED OUT DUE TO NETWORK SECURITY PERIMETER RESTRICTIONS
-# Error: NetworkSecurityPerimeterTrafficDenied - outbound request denied by NetworkSecurityPerimeter
-# Requires security team approval or provisioning through different process
+# AKS module - COMMENTED OUT DUE TO AZURE FIREWALL CONFIGURATION ISSUE
+# Error: VMExtensionError_OutBoundConnFail - nodes cannot establish outbound connection
+# Requires network team to configure Azure Firewall with AzureKubernetesService FQDN tag
+# See AKS_FIREWALL_ISSUE.md for detailed troubleshooting steps
 # 
-# module "openai" {
-#   source = "./modules/openai"
+# module "aks" {
+#   source = "./modules/aks"
 #   
 #   resource_group_name         = azurerm_resource_group.main.name
 #   location                   = azurerm_resource_group.main.location
 #   private_endpoint_subnet_id = var.private_endpoint_subnet_id
+#   private_dns_zone_id        = var.aks_private_dns_zone_id
+#   log_analytics_workspace_id = var.log_analytics_workspace_id
+#   aks_subnet_id              = var.aks_subnet_id
 #   component                  = var.component
 #   environment                = var.environment
 #   region                     = var.region
@@ -133,3 +119,18 @@ module "aks" {
 #   
 #   tags = var.common_tags
 # }
+
+# Azure OpenAI module - TESTING IF NSP RESTRICTIONS HAVE BEEN RESOLVED
+module "openai" {
+  source = "./modules/openai"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
