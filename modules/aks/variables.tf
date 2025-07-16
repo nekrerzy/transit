@@ -62,13 +62,13 @@ variable "log_analytics_workspace_id" {
 variable "dns_service_ip" {
   description = "DNS service IP for AKS cluster"
   type        = string
-  default     = "172.20.0.10"
+  default     = "10.0.0.10"
 }
 
 variable "service_cidr" {
   description = "Service CIDR for AKS cluster"
   type        = string
-  default     = "172.20.0.0/16"
+  default     = "10.0.0.0/16"
 }
 
 variable "aks_subnet_id" {
