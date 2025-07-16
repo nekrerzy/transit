@@ -104,46 +104,67 @@ output "key_vault_uris" {
   }
 }
 
-# AKS outputs - Re-enabled for testing
-output "aks_cluster_name" {
-  description = "Name of the AKS cluster"
-  value       = module.aks.aks_cluster_name
+# AKS outputs - COMMENTED OUT (pending firewall configuration)
+# output "aks_cluster_name" {
+#   description = "Name of the AKS cluster"
+#   value       = module.aks.aks_cluster_name
+# }
+
+# output "aks_cluster_fqdn" {
+#   description = "FQDN of the AKS cluster"
+#   value       = module.aks.aks_cluster_fqdn
+# }
+
+# output "aks_cluster_private_fqdn" {
+#   description = "Private FQDN of the AKS cluster"
+#   value       = module.aks.aks_cluster_private_fqdn
+# }
+
+# output "aks_kube_config" {
+#   description = "Kubernetes configuration for the AKS cluster"
+#   value       = module.aks.aks_kube_config
+#   sensitive   = true
+# }
+
+# output "aks_oidc_issuer_url" {
+#   description = "OIDC issuer URL for workload identity"
+#   value       = module.aks.aks_oidc_issuer_url
+# }
+
+# output "system_node_pool_name" {
+#   description = "Name of the system node pool"
+#   value       = module.aks.system_node_pool_name
+# }
+
+# output "user_apps_node_pool_name" {
+#   description = "Name of the user apps node pool"
+#   value       = module.aks.user_apps_node_pool_name
+# }
+
+# output "vllm_node_pool_name" {
+#   description = "Name of the VLLM node pool"
+#   value       = module.aks.vllm_node_pool_name
+# }
+
+# Azure Container Registry outputs
+output "acr_name" {
+  description = "Name of the Azure Container Registry"
+  value       = module.acr.container_registry_name
 }
 
-output "aks_cluster_fqdn" {
-  description = "FQDN of the AKS cluster"
-  value       = module.aks.aks_cluster_fqdn
+output "acr_login_server" {
+  description = "Login server URL of the container registry"
+  value       = module.acr.container_registry_login_server
 }
 
-output "aks_cluster_private_fqdn" {
-  description = "Private FQDN of the AKS cluster"
-  value       = module.aks.aks_cluster_private_fqdn
+output "acr_id" {
+  description = "ID of the Azure Container Registry"
+  value       = module.acr.container_registry_id
 }
 
-output "aks_kube_config" {
-  description = "Kubernetes configuration for the AKS cluster"
-  value       = module.aks.aks_kube_config
-  sensitive   = true
-}
-
-output "aks_oidc_issuer_url" {
-  description = "OIDC issuer URL for workload identity"
-  value       = module.aks.aks_oidc_issuer_url
-}
-
-output "system_node_pool_name" {
-  description = "Name of the system node pool"
-  value       = module.aks.system_node_pool_name
-}
-
-output "user_apps_node_pool_name" {
-  description = "Name of the user apps node pool"
-  value       = module.aks.user_apps_node_pool_name
-}
-
-output "vllm_node_pool_name" {
-  description = "Name of the VLLM node pool"
-  value       = module.aks.vllm_node_pool_name
+output "acr_private_ip" {
+  description = "Private IP address of the container registry"
+  value       = module.acr.private_endpoint_ip
 }
 
 # Azure OpenAI outputs - COMMENTED OUT (NSP restrictions still in place)

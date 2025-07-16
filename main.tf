@@ -131,16 +131,32 @@ module "key_vaults" {
   })
 }
 
-# AKS module - Re-enabled for testing with updated firewall configuration
-module "aks" {
-  source = "./modules/aks"
+# AKS module - COMMENTED OUT pending firewall configuration
+# module "aks" {
+#   source = "./modules/aks"
+#   
+#   resource_group_name         = azurerm_resource_group.main.name
+#   location                   = azurerm_resource_group.main.location
+#   private_endpoint_subnet_id = var.private_endpoint_subnet_id
+#   private_dns_zone_id        = var.aks_private_dns_zone_id
+#   log_analytics_workspace_id = var.log_analytics_workspace_id
+#   aks_subnet_id              = var.aks_subnet_id
+#   component                  = var.component
+#   environment                = var.environment
+#   region                     = var.region
+#   sequence                   = var.sequence
+#   
+#   tags = var.common_tags
+# }
+
+# Azure Container Registry module
+module "acr" {
+  source = "./modules/acr"
   
   resource_group_name         = azurerm_resource_group.main.name
   location                   = azurerm_resource_group.main.location
   private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  private_dns_zone_id        = var.aks_private_dns_zone_id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-  aks_subnet_id              = var.aks_subnet_id
+  virtual_network_id         = var.virtual_network_id
   component                  = var.component
   environment                = var.environment
   region                     = var.region
