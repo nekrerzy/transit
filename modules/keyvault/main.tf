@@ -3,7 +3,7 @@ data "azurerm_client_config" "current" {}
 
 # Key Vault with enterprise security
 resource "azurerm_key_vault" "main" {
-  name                = "kv-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  name                = "kv-${var.component}${var.environment}${var.region}${var.sequence}"
   location            = var.location
   resource_group_name = var.resource_group_name
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -150,7 +150,7 @@ resource "azurerm_private_dns_a_record" "keyvault" {
 resource "azurerm_key_vault_key" "application_key" {
   count = var.create_application_key ? 1 : 0
   
-  name         = "key-app-${var.component}-${var.environment}-${var.sequence}"
+  name         = "key-${var.component}${var.environment}${var.sequence}"
   key_vault_id = azurerm_key_vault.main.id
   key_type     = "RSA"
   key_size     = 2048
