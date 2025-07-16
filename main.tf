@@ -98,6 +98,21 @@ module "redis" {
   tags = var.common_tags
 }
 
+# Key Vault module
+module "keyvault" {
+  source = "./modules/keyvault"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
+
 # AKS module - COMMENTED OUT DUE TO AZURE FIREWALL CONFIGURATION ISSUE
 # Error: VMExtensionError_OutBoundConnFail - nodes cannot establish outbound connection
 # Requires network team to configure Azure Firewall with AzureKubernetesService FQDN tag
