@@ -8,10 +8,6 @@ variable "location" {
   type        = string
 }
 
-variable "virtual_network_id" {
-  description = "ID of the virtual network for AKS subnets"
-  type        = string
-}
 
 variable "private_endpoint_subnet_id" {
   description = "Subnet ID for private endpoints"
