@@ -126,6 +126,4 @@ resource "azurerm_monitor_diagnostic_setting" "acr" {
     category = "AllMetrics"
     enabled  = true
   }
-
-  tags = var.tags
 }
