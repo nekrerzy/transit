@@ -52,8 +52,9 @@ variable "kubernetes_version" {
 }
 
 variable "private_dns_zone_id" {
-  description = "Private DNS zone ID for AKS private cluster"
+  description = "Private DNS zone ID for AKS private cluster. Use 'System' to let AKS manage it automatically, or provide a custom private DNS zone ID"
   type        = string
+  default     = "System"
 }
 
 variable "log_analytics_workspace_id" {
