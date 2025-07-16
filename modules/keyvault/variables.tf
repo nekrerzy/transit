@@ -70,9 +70,9 @@ variable "private_dns_zone_id" {
 }
 
 variable "create_application_key" {
-  description = "Whether to create an example application encryption key"
+  description = "Whether to create an example application encryption key (requires private access)"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "additional_rbac_assignments" {
