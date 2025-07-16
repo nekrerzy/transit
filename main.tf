@@ -120,17 +120,21 @@ module "redis" {
 #   tags = var.common_tags
 # }
 
-# Azure OpenAI module - TESTING IF NSP RESTRICTIONS HAVE BEEN RESOLVED
-module "openai" {
-  source = "./modules/openai"
-  
-  resource_group_name         = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  component                  = var.component
-  environment                = var.environment
-  region                     = var.region
-  sequence                   = var.sequence
-  
-  tags = var.common_tags
-}
+# Azure OpenAI module - STILL BLOCKED BY NETWORK SECURITY PERIMETER
+# Error: NetworkSecurityPerimeterTrafficDenied - outbound request denied by NetworkSecurityPerimeter
+# NSP restrictions remain in place as of $(date)
+# Requires security team approval or provisioning through different process
+# 
+# module "openai" {
+#   source = "./modules/openai"
+#   
+#   resource_group_name         = azurerm_resource_group.main.name
+#   location                   = azurerm_resource_group.main.location
+#   private_endpoint_subnet_id = var.private_endpoint_subnet_id
+#   component                  = var.component
+#   environment                = var.environment
+#   region                     = var.region
+#   sequence                   = var.sequence
+#   
+#   tags = var.common_tags
+# }
