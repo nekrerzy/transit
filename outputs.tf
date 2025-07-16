@@ -1,21 +1,29 @@
-output "storage_account_name" {
-  description = "Name of the created storage account"
-  value       = module.storage_account.storage_account_name
+output "storage_accounts" {
+  description = "Map of all created storage accounts with their details"
+  value = {
+    for purpose, account in module.storage_accounts : purpose => {
+      name = account.storage_account_name
+      id   = account.storage_account_id
+      primary_blob_endpoint = account.storage_account_primary_endpoint
+    }
+  }
 }
 
-output "storage_account_id" {
-  description = "ID of the created storage account"
-  value       = module.storage_account.storage_account_id
+output "storage_account_names" {
+  description = "Names of all created storage accounts"
+  value = {
+    for purpose, account in module.storage_accounts : purpose => account.storage_account_name
+  }
 }
 
 output "key_vault_uri" {
   description = "URI of the Key Vault used for CMK"
-  value       = module.storage_account.key_vault_uri
+  value       = values(module.storage_accounts)[0].key_vault_uri
 }
 
 output "resource_group_name" {
   description = "Name of the created resource group"
-  value       = module.storage_account.resource_group_name
+  value       = values(module.storage_accounts)[0].resource_group_name
 }
 
 # PostgreSQL outputs

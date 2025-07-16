@@ -33,9 +33,11 @@ resource "azurerm_resource_group" "main" {
   tags     = var.common_tags
 }
 
-# Storage account module
-module "storage_account" {
+# Storage accounts for different purposes
+module "storage_accounts" {
   source = "./modules/storage"
+  
+  for_each = var.storage_accounts
   
   resource_group_name         = azurerm_resource_group.main.name
   location                   = azurerm_resource_group.main.location
@@ -46,7 +48,13 @@ module "storage_account" {
   region                     = var.region
   sequence                   = var.sequence
   
-  tags = var.common_tags
+  # Override purpose for naming
+  storage_purpose = each.key
+  
+  tags = merge(var.common_tags, {
+    Purpose = each.value.purpose
+    DataType = each.value.data_type
+  })
 }
 
 # PostgreSQL module

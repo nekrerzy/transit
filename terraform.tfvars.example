@@ -25,3 +25,23 @@ common_tags = {
   CostCenter   = "IT"
   Sovereignty  = "Confidential"
 }
+
+# Storage accounts configuration - customize as needed
+# storage_accounts = {
+#   general = {
+#     purpose   = "General application storage"
+#     data_type = "Application"
+#   }
+#   ragdata = {
+#     purpose   = "RAG data and embeddings storage"
+#     data_type = "AI/ML"
+#   }
+#   logs = {
+#     purpose   = "Application logs and diagnostics"
+#     data_type = "Logs"
+#   }
+#   backup = {
+#     purpose   = "Database and application backups"
+#     data_type = "Backup"
+#   }
+# }

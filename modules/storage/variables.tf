@@ -49,3 +49,9 @@ variable "network_resource_group_name" {
   type        = string
   default     = "rg-network-dev-incp-uaen-001"
 }
+
+variable "storage_purpose" {
+  description = "Purpose identifier for storage account naming (e.g., general, ragdata, logs)"
+  type        = string
+  default     = "general"
+}

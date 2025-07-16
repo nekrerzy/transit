@@ -87,3 +87,25 @@ variable "common_tags" {
     ManagedBy   = "terraform"
   }
 }
+
+variable "storage_accounts" {
+  description = "Map of storage accounts to create with different purposes"
+  type = map(object({
+    purpose   = string
+    data_type = string
+  }))
+  default = {
+    general = {
+      purpose   = "General application storage"
+      data_type = "Application"
+    }
+    ragdata = {
+      purpose   = "RAG data and embeddings storage"
+      data_type = "AI/ML"
+    }
+    logs = {
+      purpose   = "Application logs and diagnostics"
+      data_type = "Logs"
+    }
+  }
+}

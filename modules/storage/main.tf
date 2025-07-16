@@ -21,7 +21,7 @@ data "azurerm_user_assigned_identity" "existing" {
 
 # Key for storage account encryption in existing Key Vault
 resource "azurerm_key_vault_key" "storage_key" {
-  name         = "key-storage-${var.component}-${var.environment}-${var.sequence}"
+  name         = "key-storage-${var.storage_purpose}-${var.component}-${var.environment}-${var.sequence}"
   key_vault_id = data.azurerm_key_vault.existing.id
   key_type     = "RSA"
   key_size     = 2048
@@ -38,7 +38,7 @@ resource "azurerm_key_vault_key" "storage_key" {
 
 # Storage account with CMK encryption and no access keys
 resource "azurerm_storage_account" "main" {
-  name                = "st${var.component}${var.environment}incp${var.region}${random_string.storage_suffix.result}"
+  name                = "st${var.storage_purpose}${var.environment}incp${var.region}${random_string.storage_suffix.result}"
   resource_group_name = var.resource_group_name
   location            = var.location
 
