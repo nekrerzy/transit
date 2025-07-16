@@ -144,6 +144,8 @@ resource "azurerm_disk_encryption_set" "aks" {
     identity_ids = [data.azurerm_user_assigned_identity.existing.id]
   }
 
+  depends_on = [azurerm_key_vault_key.aks_key]
+
   tags = var.tags
 }
 

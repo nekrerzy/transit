@@ -18,16 +18,21 @@ The AKS nodes cannot resolve the Kubernetes API server's private DNS name becaus
 
 ## Network Architecture Context
 - **Hub-and-spoke topology** with centralized DNS servers
-- **Custom DNS servers** in hub handle all DNS resolution
-- **Private endpoints** for other services (storage, Key Vault, etc.) work correctly
-- **AKS requires** specific DNS resolution for private API server endpoints
+- **VNet**: `vnet-bain-dev-incp-uaen-001` (172.20.160.0/24) in `rg-bain-dev-incp-uaen-001`
+- **Hub peering**: Connected to `vnet-ihub-prd-incp-uaen` for centralized services
+- **Custom DNS server**: `172.20.1.132` configured for all DNS resolution
+- **Default route**: Traffic routed through Azure Firewall at `172.20.0.4`
+- **Private endpoints**: 9 successfully deployed in SNET-PE (172.20.160.128/25)
+- **AKS subnet**: SNET-AKS (172.20.160.0/25) ready for deployment
+- **AKS requires**: specific DNS resolution for private API server endpoints
 
 ## Technical Requirements for Network Team
 
 ### 1. DNS Forwarder Configuration
-Configure DNS forwarders in the hub DNS servers for:
-- `*.privatelink.*.azmk8s.io` → Forward to Azure DNS (168.63.129.16)
-- `*.azmk8s.io` → Forward to Azure DNS (168.63.129.16)
+Configure DNS forwarders in the hub DNS server (`172.20.1.132`) for:
+- `*.privatelink.uaenorth.azmk8s.io` → Forward to Azure DNS (168.63.129.16)
+- `*.uaenorth.azmk8s.io` → Forward to Azure DNS (168.63.129.16)
+- `*.privatelink.*.azmk8s.io` → Forward to Azure DNS (168.63.129.16) (wildcard for all regions)
 
 ### 2. Private DNS Zone Integration
 Create private DNS zones in hub resource group:
@@ -42,9 +47,11 @@ Update custom DNS servers in hub to:
 
 ### 4. Network Connectivity Verification
 Verify that:
-- AKS subnet (SNET-AKS) can reach hub DNS servers
-- Hub DNS servers can reach Azure DNS (168.63.129.16)
+- AKS subnet (SNET-AKS: 172.20.160.0/25) can reach hub DNS server (172.20.1.132)
+- Hub DNS server (172.20.1.132) can reach Azure DNS (168.63.129.16)
 - DNS resolution works from AKS subnet to `*.azmk8s.io` domains
+- Route table `rt-bain-dev-incp-uaen-001` properly routes AKS traffic through hub firewall
+- NSG `nsg-bain-dev-incp-uaen-001` allows DNS traffic (port 53) between subnets
 
 ## Attempted Solutions
 1. **`private_dns_zone_id = "System"`** → DNS lookup failure
@@ -53,14 +60,14 @@ Verify that:
 4. **Azure Firewall FQDN tags** → Resolves outbound connectivity but not DNS resolution
 
 ## Working Infrastructure
-The following services deploy successfully with private endpoints:
-- ✅ Azure Storage (3x accounts)
-- ✅ PostgreSQL Flexible Server
+The following services deploy successfully with private endpoints in SNET-PE (172.20.160.128/25):
+- ✅ Azure Storage (3x accounts: general, ragdata, logs)
+- ✅ PostgreSQL Flexible Server (with delegated subnet)
 - ✅ Redis Cache
 - ✅ Azure Search
-- ✅ Key Vault (3x instances)
+- ✅ Key Vault (3x instances: app, ai, cert)
 - ✅ Azure Container Registry
-- ❌ AKS (DNS resolution blocked)
+- ❌ AKS (DNS resolution blocked for private API server)
 
 ## Recommended Actions
 1. **Network Team**: Configure DNS forwarders for AKS domains
@@ -79,11 +86,44 @@ The following services deploy successfully with private endpoints:
 - DevOps pipeline integration delayed
 - Application containerization roadmap affected
 
+## Network Infrastructure Analysis
+
+### Current VNet Configuration
+```json
+{
+  "name": "vnet-bain-dev-incp-uaen-001",
+  "addressSpace": "172.20.160.0/24",
+  "location": "UAE North",
+  "dnsServers": ["172.20.1.132"],
+  "resourceGroup": "rg-bain-dev-incp-uaen-001"
+}
+```
+
+### Subnet Configuration
+| Subnet | CIDR | Purpose | Status |
+|--------|------|---------|--------|
+| SNET-PE | 172.20.160.128/25 | Private Endpoints | ✅ 9 PEs deployed |
+| SNET-AKS | 172.20.160.0/25 | AKS Node Pools | ⚠️ Ready for deployment |
+
+### Hub-and-Spoke Connectivity
+- **Hub VNet**: `vnet-ihub-prd-incp-uaen` (peering active)
+- **DNS Server**: `172.20.1.132` (centralized in hub)
+- **Default Gateway**: `172.20.0.4` (Azure Firewall in hub)
+- **Route Table**: `rt-bain-dev-incp-uaen-001` (0.0.0.0/0 → 172.20.0.4)
+
+### Existing Private Endpoints (Working)
+All 9 private endpoints successfully resolve DNS through the hub architecture:
+- Storage accounts (3x), PostgreSQL, Redis, Search, Key Vaults (3x), ACR
+
+### DNS Resolution Chain
+**Current (Working)**: App → SNET-PE → Hub DNS (172.20.1.132) → Azure DNS (168.63.129.16)
+**AKS (Failing)**: AKS Nodes → SNET-AKS → Hub DNS (172.20.1.132) → ❌ No forwarder for `*.azmk8s.io`
+
 ## Next Steps
-1. Engage network team for DNS forwarder configuration
-2. Test DNS resolution from AKS subnet
-3. Re-enable AKS module after DNS fixes
-4. Validate complete container platform deployment
+1. **Network Team**: Configure DNS forwarders for AKS domains on `172.20.1.132`
+2. **Testing**: Verify DNS resolution from AKS subnet (172.20.160.0/25)
+3. **Deployment**: Re-enable AKS module after DNS fixes
+4. **Validation**: Test complete container platform deployment
 
 ---
 *This issue is infrastructure-level and requires network team intervention rather than Terraform configuration changes.*
