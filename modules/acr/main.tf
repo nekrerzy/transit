@@ -49,6 +49,9 @@ resource "azurerm_container_registry" "main" {
 
   # Data endpoint access
   data_endpoint_enabled = true
+  
+  # Export policy - explicitly disabled to satisfy Azure Policy
+  export_policy_enabled = false
 
   # Identity for CMK
   identity {
@@ -81,29 +84,16 @@ resource "azurerm_private_endpoint" "acr" {
 
   private_dns_zone_group {
     name                 = "dns-zone-group"
-    private_dns_zone_ids = [azurerm_private_dns_zone.acr.id]
+    private_dns_zone_ids = [data.azurerm_private_dns_zone.acr.id]
   }
 
   tags = var.tags
 }
 
-# Private DNS zone for ACR
-resource "azurerm_private_dns_zone" "acr" {
+# Reference existing private DNS zone for ACR (created by network team)
+data "azurerm_private_dns_zone" "acr" {
   name                = "privatelink.azurecr.io"
-  resource_group_name = var.resource_group_name
-
-  tags = var.tags
-}
-
-# Link private DNS zone to virtual network
-resource "azurerm_private_dns_zone_virtual_network_link" "acr" {
-  name                  = "acr-dns-link"
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.acr.name
-  virtual_network_id    = var.virtual_network_id
-  registration_enabled  = false
-
-  tags = var.tags
+  resource_group_name = var.network_resource_group_name
 }
 
 # Diagnostic settings for ACR
