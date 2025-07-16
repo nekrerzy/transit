@@ -44,7 +44,7 @@ variable "tags" {
 variable "kubernetes_version" {
   description = "Kubernetes version for AKS cluster"
   type        = string
-  default     = "1.29"
+  default     = "1.32.5"
 }
 
 variable "private_dns_zone_id" {
