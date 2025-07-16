@@ -79,7 +79,7 @@ variable "aks_subnet_id" {
 variable "availability_zones" {
   description = "Availability zones for node pools"
   type        = list(string)
-  default     = ["1", "2", "3"]
+  default     = ["1", "3"]
 }
 
 # System Node Pool Configuration
