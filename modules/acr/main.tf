@@ -3,13 +3,13 @@ data "azurerm_client_config" "current" {}
 
 # Reference existing Key Vault from security RG for CMK
 data "azurerm_key_vault" "existing" {
-  name                = "kv-security-dev-incp-uaen-001"
+  name                = "kv-bain-dev-incp-uaen-01"
   resource_group_name = "rg-security-dev-incp-uaen-001"
 }
 
 # Reference existing managed identity from security RG for CMK
 data "azurerm_user_assigned_identity" "existing" {
-  name                = "id-acr-cmk-dev-incp-uaen-001"
+  name                = "id-storage-cmk-dev-incp-uaen-001"
   resource_group_name = "rg-security-dev-incp-uaen-001"
 }
 
