@@ -50,23 +50,6 @@ resource "azurerm_container_registry" "main" {
   # Data endpoint access
   data_endpoint_enabled = true
 
-  # Quarantine policy
-  quarantine_policy_enabled = true
-
-  # Retention policy
-  retention_policy {
-    enabled = true
-    days    = var.retention_days
-  }
-
-  # Trust policy
-  trust_policy {
-    enabled = true
-  }
-
-  # Export policy
-  export_policy_enabled = false # Disabled for security
-
   # Identity for CMK
   identity {
     type         = "UserAssigned"
@@ -75,7 +58,6 @@ resource "azurerm_container_registry" "main" {
 
   # Customer-managed key encryption
   encryption {
-    enabled            = true
     key_vault_key_id   = azurerm_key_vault_key.acr_key.id
     identity_client_id = data.azurerm_user_assigned_identity.existing.client_id
   }

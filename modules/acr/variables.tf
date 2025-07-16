@@ -61,11 +61,6 @@ variable "zone_redundancy_enabled" {
   default     = true
 }
 
-variable "retention_days" {
-  description = "Number of days to retain untagged manifests"
-  type        = number
-  default     = 30
-}
 
 variable "enable_diagnostics" {
   description = "Enable diagnostic settings for ACR"
