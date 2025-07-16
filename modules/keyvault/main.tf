@@ -16,6 +16,9 @@ resource "azurerm_key_vault" "main" {
   purge_protection_enabled        = true
   soft_delete_retention_days      = 90
 
+  # Enable RBAC authorization (required by Azure Policy)
+  enable_rbac_authorization = true
+
   # Network access restrictions
   public_network_access_enabled = false
   
@@ -30,90 +33,29 @@ resource "azurerm_key_vault" "main" {
   tags = var.tags
 }
 
-# Access policy for the current service principal
-resource "azurerm_key_vault_access_policy" "terraform" {
-  key_vault_id = azurerm_key_vault.main.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
-
-  key_permissions = [
-    "Backup",
-    "Create",
-    "Decrypt",
-    "Delete",
-    "Encrypt",
-    "Get",
-    "Import",
-    "List",
-    "Purge",
-    "Recover",
-    "Restore",
-    "Sign",
-    "UnwrapKey",
-    "Update",
-    "Verify",
-    "WrapKey",
-    "GetRotationPolicy",
-    "SetRotationPolicy"
-  ]
-
-  secret_permissions = [
-    "Backup",
-    "Delete",
-    "Get",
-    "List",
-    "Purge",
-    "Recover",
-    "Restore",
-    "Set"
-  ]
-
-  certificate_permissions = [
-    "Backup",
-    "Create",
-    "Delete",
-    "DeleteIssuers",
-    "Get",
-    "GetIssuers",
-    "Import",
-    "List",
-    "ListIssuers",
-    "ManageContacts",
-    "ManageIssuers",
-    "Purge",
-    "Recover",
-    "Restore",
-    "SetIssuers",
-    "Update"
-  ]
+# RBAC role assignment for the current service principal (Key Vault Administrator)
+resource "azurerm_role_assignment" "terraform_admin" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
 
-# Access policy for existing managed identity (for CMK encryption)
-resource "azurerm_key_vault_access_policy" "managed_identity" {
+# RBAC role assignment for managed identity (Key Vault Crypto Service Encryption User)
+resource "azurerm_role_assignment" "managed_identity" {
   count = var.managed_identity_object_id != null ? 1 : 0
   
-  key_vault_id = azurerm_key_vault.main.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = var.managed_identity_object_id
-
-  key_permissions = [
-    "Get",
-    "WrapKey",
-    "UnwrapKey"
-  ]
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = var.managed_identity_object_id
 }
 
-# Additional access policies for specific users/groups
-resource "azurerm_key_vault_access_policy" "additional" {
-  for_each = var.additional_access_policies
+# Additional RBAC role assignments for specific users/groups
+resource "azurerm_role_assignment" "additional" {
+  for_each = var.additional_rbac_assignments
 
-  key_vault_id = azurerm_key_vault.main.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = each.value.object_id
-
-  key_permissions         = each.value.key_permissions
-  secret_permissions      = each.value.secret_permissions
-  certificate_permissions = each.value.certificate_permissions
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = each.value.role_definition_name
+  principal_id         = each.value.principal_id
 }
 
 # Private endpoint for Key Vault
@@ -164,5 +106,5 @@ resource "azurerm_key_vault_key" "application_key" {
     "wrapKey",
   ]
 
-  depends_on = [azurerm_key_vault_access_policy.terraform]
+  depends_on = [azurerm_role_assignment.terraform_admin]
 }

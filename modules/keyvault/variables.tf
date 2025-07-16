@@ -75,13 +75,11 @@ variable "create_application_key" {
   default     = true
 }
 
-variable "additional_access_policies" {
-  description = "Additional access policies for users/groups"
+variable "additional_rbac_assignments" {
+  description = "Additional RBAC role assignments for users/groups"
   type = map(object({
-    object_id               = string
-    key_permissions         = list(string)
-    secret_permissions      = list(string)
-    certificate_permissions = list(string)
+    principal_id         = string
+    role_definition_name = string
   }))
   default = {}
 }

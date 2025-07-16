@@ -38,11 +38,11 @@ output "application_key_name" {
   value       = var.create_application_key ? azurerm_key_vault_key.application_key[0].name : null
 }
 
-output "access_policy_ids" {
-  description = "IDs of all access policies created"
+output "rbac_assignment_ids" {
+  description = "IDs of all RBAC role assignments created"
   value = {
-    terraform = azurerm_key_vault_access_policy.terraform.id
-    managed_identity = var.managed_identity_object_id != null ? azurerm_key_vault_access_policy.managed_identity[0].id : null
-    additional = { for k, v in azurerm_key_vault_access_policy.additional : k => v.id }
+    terraform = azurerm_role_assignment.terraform_admin.id
+    managed_identity = var.managed_identity_object_id != null ? azurerm_role_assignment.managed_identity[0].id : null
+    additional = { for k, v in azurerm_role_assignment.additional : k => v.id }
   }
 }
