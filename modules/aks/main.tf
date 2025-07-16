@@ -119,10 +119,11 @@ resource "azurerm_key_vault_key" "aks_key" {
 
 # Disk encryption set for AKS
 resource "azurerm_disk_encryption_set" "aks" {
-  name                = "des-aks-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  key_vault_key_id    = azurerm_key_vault_key.aks_key.id
+  name                      = "des-aks-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  resource_group_name       = var.resource_group_name
+  location                  = var.location
+  key_vault_key_id          = azurerm_key_vault_key.aks_key.id
+  encryption_type           = "EncryptionAtRestWithPlatformAndCustomerKeys"  # Double encryption for policy compliance
 
   identity {
     type         = "UserAssigned"
