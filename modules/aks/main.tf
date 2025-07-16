@@ -11,6 +11,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   private_dns_zone_id                = var.private_dns_zone_id
   private_cluster_public_fqdn_enabled = false
 
+  # API server vnet integration (new syntax for v4.x)
+  api_server_vnet_integration_enabled = true
+  api_server_subnet_id               = var.aks_subnet_id
+
   # Network configuration
   network_profile {
     network_plugin      = "azure"
@@ -26,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     vm_size                      = var.system_vm_size
     vnet_subnet_id               = var.aks_subnet_id
     zones                        = var.availability_zones
-    enable_auto_scaling          = true
+    auto_scaling_enabled         = true
     min_count                    = var.system_min_count
     max_count                    = var.system_max_count
     max_pods                     = 30
@@ -48,11 +52,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   # Disk encryption using existing CMK
   disk_encryption_set_id = azurerm_disk_encryption_set.aks.id
 
-  # API server access profile for private cluster
-  api_server_access_profile {
-    vnet_integration_enabled = true
-    subnet_id                = var.aks_subnet_id
-  }
 
   # Auto scaler profile
   auto_scaler_profile {
@@ -145,7 +144,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
   vm_size              = var.user_vm_size
   vnet_subnet_id       = var.aks_subnet_id
   zones                = var.availability_zones
-  enable_auto_scaling  = true
+  auto_scaling_enabled = true
   min_count           = var.user_min_count
   max_count           = var.user_max_count
   max_pods            = 110
@@ -172,7 +171,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "vllm" {
   vm_size              = var.vllm_vm_size
   vnet_subnet_id       = var.aks_subnet_id
   zones                = var.availability_zones
-  enable_auto_scaling  = true
+  auto_scaling_enabled = true
   min_count           = var.vllm_min_count
   max_count           = var.vllm_max_count
   max_pods            = 30
