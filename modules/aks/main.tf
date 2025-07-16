@@ -11,6 +11,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
   private_dns_zone_id                = var.private_dns_zone_id
   private_cluster_public_fqdn_enabled = false
 
+  # Disable local authentication for policy compliance
+  local_account_disabled = true
+
   # Network configuration
   network_profile {
     network_plugin      = "azure"
@@ -33,6 +36,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     os_disk_size_gb              = 128
     os_disk_type                 = "Managed"
     only_critical_addons_enabled = true
+    host_encryption_enabled      = true  # Required by policy for encryption at host
 
     upgrade_settings {
       max_surge = "33%"
@@ -136,17 +140,18 @@ resource "azurerm_disk_encryption_set" "aks" {
 
 # User apps node pool
 resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
-  name                  = "userapps"
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-  vm_size              = var.user_vm_size
-  vnet_subnet_id       = var.aks_subnet_id
-  zones                = var.availability_zones
-  auto_scaling_enabled = true
-  min_count           = var.user_min_count
-  max_count           = var.user_max_count
-  max_pods            = 110
-  os_disk_size_gb     = 128
-  os_disk_type        = "Managed"
+  name                     = "userapps"
+  kubernetes_cluster_id    = azurerm_kubernetes_cluster.aks.id
+  vm_size                 = var.user_vm_size
+  vnet_subnet_id          = var.aks_subnet_id
+  zones                   = var.availability_zones
+  auto_scaling_enabled    = true
+  min_count              = var.user_min_count
+  max_count              = var.user_max_count
+  max_pods               = 110
+  os_disk_size_gb        = 128
+  os_disk_type           = "Managed"
+  host_encryption_enabled = true  # Required by policy for encryption at host
 
   # Node labels for workload targeting
   node_labels = {
@@ -163,17 +168,18 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_apps" {
 
 # VLLM workload node pool (normal VMs for now, will be updated to GPU later)
 resource "azurerm_kubernetes_cluster_node_pool" "vllm" {
-  name                  = "vllm"
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-  vm_size              = var.vllm_vm_size
-  vnet_subnet_id       = var.aks_subnet_id
-  zones                = var.availability_zones
-  auto_scaling_enabled = true
-  min_count           = var.vllm_min_count
-  max_count           = var.vllm_max_count
-  max_pods            = 30
-  os_disk_size_gb     = 256
-  os_disk_type        = "Managed"
+  name                     = "vllm"
+  kubernetes_cluster_id    = azurerm_kubernetes_cluster.aks.id
+  vm_size                 = var.vllm_vm_size
+  vnet_subnet_id          = var.aks_subnet_id
+  zones                   = var.availability_zones
+  auto_scaling_enabled    = true
+  min_count              = var.vllm_min_count
+  max_count              = var.vllm_max_count
+  max_pods               = 30
+  os_disk_size_gb        = 256
+  os_disk_type           = "Managed"
+  host_encryption_enabled = true  # Required by policy for encryption at host
 
   # Node labels and taints for ML workloads
   node_labels = {
