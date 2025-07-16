@@ -11,6 +11,12 @@ resource "azurerm_kubernetes_cluster" "aks" {
   private_dns_zone_id                = var.private_dns_zone_id
   private_cluster_public_fqdn_enabled = false
 
+  # Azure AD integration (required for disabling local accounts)
+  azure_active_directory_role_based_access_control {
+    managed            = true
+    azure_rbac_enabled = true
+  }
+
   # Disable local authentication for policy compliance
   local_account_disabled = true
 
