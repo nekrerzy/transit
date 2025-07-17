@@ -138,28 +138,25 @@ module "key_vaults" {
   })
 }
 
-# AKS module - BLOCKED BY DNS CONFIGURATION IN HUB-AND-SPOKE ARCHITECTURE
-# Error: VMExtensionError_K8SAPIServerDNSLookupFail
-# Root cause: Custom DNS servers in hub-and-spoke cannot resolve AKS API server private DNS
-# Requires network team to configure DNS forwarders for *.privatelink.*.azmk8s.io zones
-# See AKS_DNS_ISSUE.md for detailed troubleshooting and network requirements
-# 
-# module "aks" {
-#   source = "./modules/aks"
-#   
-#   resource_group_name         = azurerm_resource_group.main.name
-#   location                   = azurerm_resource_group.main.location
-#   private_endpoint_subnet_id = var.private_endpoint_subnet_id
-#   private_dns_zone_id        = var.aks_private_dns_zone_id
-#   log_analytics_workspace_id = var.log_analytics_workspace_id
-#   aks_subnet_id              = var.aks_subnet_id
-#   component                  = var.component
-#   environment                = var.environment
-#   region                     = var.region
-#   sequence                   = var.sequence
-#   
-#   tags = var.common_tags
-# }
+# AKS module - TESTING WITH EXISTING PRIVATE DNS ZONE
+# Updated per Mohamed Soliman: Using existing privatelink.uaenorth.azmk8s.io zone
+# DNS zone already exists in rg-dns-prd-incp-uaen-001
+module "aks" {
+  source = "./modules/aks"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  private_dns_zone_id        = var.aks_private_dns_zone_id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+  aks_subnet_id              = var.aks_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
 
 # Azure Container Registry module
 module "acr" {
