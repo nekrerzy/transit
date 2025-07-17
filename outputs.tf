@@ -26,27 +26,27 @@ output "resource_group_name" {
   value       = values(module.storage_accounts)[0].resource_group_name
 }
 
-# PostgreSQL outputs - RE-ENABLED
-output "postgresql_server_name" {
-  description = "Name of the PostgreSQL server"
-  value       = module.postgresql.postgresql_server_name
-}
+# PostgreSQL outputs - COMMENTED OUT FOR AKS TESTING
+# output "postgresql_server_name" {
+#   description = "Name of the PostgreSQL server"
+#   value       = module.postgresql.postgresql_server_name
+# }
 
-output "postgresql_server_fqdn" {
-  description = "FQDN of the PostgreSQL server"
-  value       = module.postgresql.postgresql_server_fqdn
-}
+# output "postgresql_server_fqdn" {
+#   description = "FQDN of the PostgreSQL server"
+#   value       = module.postgresql.postgresql_server_fqdn
+# }
 
-output "postgresql_database_name" {
-  description = "Name of the PostgreSQL database"
-  value       = module.postgresql.database_name
-}
+# output "postgresql_database_name" {
+#   description = "Name of the PostgreSQL database"
+#   value       = module.postgresql.database_name
+# }
 
-output "postgresql_admin_password" {
-  description = "Generated PostgreSQL admin password"
-  value       = module.postgresql.admin_password
-  sensitive   = true
-}
+# output "postgresql_admin_password" {
+#   description = "Generated PostgreSQL admin password"
+#   value       = module.postgresql.admin_password
+#   sensitive   = true
+# }
 
 # Azure Search outputs
 output "search_service_name" {
