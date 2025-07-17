@@ -63,9 +63,9 @@ variable "location" {
 
 # AKS Configuration
 variable "aks_private_dns_zone_id" {
-  description = "Private DNS zone ID for AKS private cluster. Use existing privatelink.uaenorth.azmk8s.io zone per Mohamed Soliman"
+  description = "Private DNS zone ID for AKS private cluster. Set to null per Mohamed Soliman - virtual link already exists in hub"
   type        = string
-  default     = "/subscriptions/4a9375c7-9146-459b-b53f-fa11809e9e41/resourceGroups/rg-dns-prd-incp-uaen-001/providers/Microsoft.Network/privateDnsZones/privatelink.uaenorth.azmk8s.io"
+  default     = null
 }
 
 variable "log_analytics_workspace_id" {

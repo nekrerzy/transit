@@ -53,10 +53,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     }
   }
 
-  # Identity configuration
+  # Identity configuration - SystemAssigned for simpler permissions
   identity {
-    type         = "UserAssigned"
-    identity_ids = [data.azurerm_user_assigned_identity.existing.id]
+    type = "SystemAssigned"
   }
 
   # Disk encryption using existing CMK
