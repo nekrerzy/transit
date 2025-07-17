@@ -136,25 +136,6 @@ resource "azapi_resource" "openai_nsp_profile" {
   body = {
     properties = {
       description = "NSP Profile for OpenAI Cognitive Services"
-      # Allow inbound access from specified sources
-      accessRules = [
-        {
-          name = "allow-vnet-inbound"
-          properties = {
-            direction = "Inbound"
-            addressPrefixes = [
-              var.vnet_address_space,
-              var.private_endpoint_subnet_cidr
-            ]
-            subscriptions = [
-              {
-                id = var.subscription_id
-              }
-            ]
-          }
-        }
-      ]
-      # Allow outbound access to required services
       accessRulesVersion = 1
     }
   }
@@ -162,7 +143,31 @@ resource "azapi_resource" "openai_nsp_profile" {
   depends_on = [azapi_resource.openai_nsp]
 }
 
-# NSP Access Rules for outbound traffic
+# NSP Inbound Access Rule
+resource "azapi_resource" "openai_nsp_inbound_rule" {
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2023-07-01-preview"
+  name      = "allow-vnet-inbound"
+  parent_id = azapi_resource.openai_nsp_profile.id
+  
+  body = {
+    properties = {
+      direction = "Inbound"
+      addressPrefixes = [
+        var.vnet_address_space,
+        var.private_endpoint_subnet_cidr
+      ]
+      subscriptions = [
+        {
+          id = var.subscription_id
+        }
+      ]
+    }
+  }
+
+  depends_on = [azapi_resource.openai_nsp_profile]
+}
+
+# NSP Outbound Access Rule for Cognitive Services
 resource "azapi_resource" "openai_nsp_outbound_rule" {
   type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2023-07-01-preview"
   name      = "allow-cognitive-services-outbound"
@@ -221,6 +226,7 @@ resource "azapi_resource" "openai_nsp_association" {
   depends_on = [
     azurerm_cognitive_account.openai,
     azapi_resource.openai_nsp_profile,
+    azapi_resource.openai_nsp_inbound_rule,
     azapi_resource.openai_nsp_outbound_rule
   ]
 }
