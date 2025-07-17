@@ -127,106 +127,48 @@ resource "azapi_resource" "openai_nsp" {
   tags = var.tags
 }
 
-# NSP Profile for OpenAI
+# NSP Profile for OpenAI (simplified)
 resource "azapi_resource" "openai_nsp_profile" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/profiles@2023-07-01-preview"
-  name      = "profile-openai"
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles@2024-06-01-preview"
+  name      = "profile-oai-${var.component}-${var.environment}"
   parent_id = azapi_resource.openai_nsp.id
+  body      = { properties = {} }
   
-  body = {
-    properties = {
-      description = "NSP Profile for OpenAI Cognitive Services"
-      accessRulesVersion = 1
-    }
-  }
-
   depends_on = [azapi_resource.openai_nsp]
-}
-
-# NSP Inbound Access Rule
-resource "azapi_resource" "openai_nsp_inbound_rule" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2023-07-01-preview"
-  name      = "allow-vnet-inbound"
-  parent_id = azapi_resource.openai_nsp_profile.id
-  
-  body = {
-    properties = {
-      direction = "Inbound"
-      addressPrefixes = [
-        var.vnet_address_space,
-        var.private_endpoint_subnet_cidr
-      ]
-      subscriptions = [
-        {
-          id = var.subscription_id
-        }
-      ]
-    }
-  }
-
-  depends_on = [azapi_resource.openai_nsp_profile]
 }
 
 # NSP Outbound Access Rule for Cognitive Services
 resource "azapi_resource" "openai_nsp_outbound_rule" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2023-07-01-preview"
-  name      = "allow-cognitive-services-outbound"
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2024-06-01-preview"
+  name      = "rule-openai-egress"
   parent_id = azapi_resource.openai_nsp_profile.id
   
   body = {
     properties = {
-      direction = "Outbound"
-      destinations = [
-        {
-          domainNames = [
-            "*.cognitive.microsoft.com",
-            "*.cognitiveservices.azure.com",
-            "*.openai.azure.com"
-          ]
-        }
-      ]
-      networkIdentifiers = [
-        {
-          networkIdentifierType = "ServiceTag"
-          identifier = "CognitiveServices"
-        },
-        {
-          networkIdentifierType = "ServiceTag"
-          identifier = "AzureActiveDirectory"
-        },
-        {
-          networkIdentifierType = "ServiceTag"
-          identifier = "AzureResourceManager"
-        }
-      ]
+      direction                 = "Outbound"
+      fullyQualifiedDomainNames = ["*.cognitiveservices.azure.com"]
     }
   }
-
+  
   depends_on = [azapi_resource.openai_nsp_profile]
 }
 
 # Associate OpenAI account with NSP
 resource "azapi_resource" "openai_nsp_association" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/resourceAssociations@2023-07-01-preview"
-  name      = "assoc-${azurerm_cognitive_account.openai.name}"
+  type      = "Microsoft.Network/networkSecurityPerimeters/resourceAssociations@2024-07-01"
+  name      = "assoc-oai-${var.component}-${var.environment}"
   parent_id = azapi_resource.openai_nsp.id
   
   body = {
     properties = {
-      privateLinkResource = {
-        id = azurerm_cognitive_account.openai.id
-      }
-      profile = {
-        id = azapi_resource.openai_nsp_profile.id
-      }
-      accessMode = "enforced"
+      privateLinkResource = { id = azurerm_cognitive_account.openai.id }
+      profile             = { id = azapi_resource.openai_nsp_profile.id }
+      accessMode          = "Learning"  # Change to "Enforced" after validation
     }
   }
   
   depends_on = [
     azurerm_cognitive_account.openai,
-    azapi_resource.openai_nsp_profile,
-    azapi_resource.openai_nsp_inbound_rule,
     azapi_resource.openai_nsp_outbound_rule
   ]
 }
