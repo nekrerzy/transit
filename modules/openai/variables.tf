@@ -51,19 +51,4 @@ variable "tags" {
   default     = {}
 }
 
-variable "subscription_id" {
-  description = "Azure subscription ID for NSP configuration"
-  type        = string
-}
-
-variable "vnet_address_space" {
-  description = "VNet address space for NSP allowed sources"
-  type        = string
-  default     = "172.20.160.0/24"
-}
-
-variable "private_endpoint_subnet_cidr" {
-  description = "Private endpoint subnet CIDR for NSP allowed sources"
-  type        = string
-  default     = "172.20.160.128/25"
-}
+# NSP-related variables temporarily removed for simplified deployment

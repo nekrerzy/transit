@@ -183,22 +183,19 @@ module "acr" {
   tags = var.common_tags
 }
 
-# Azure OpenAI module - TESTING FOR NSP RESTRICTIONS
-# Previous error: NetworkSecurityPerimeterTrafficDenied 
-# Re-enabling to test current NSP configuration
+# Azure OpenAI module - BASIC DEPLOYMENT
+# NSP configuration temporarily removed for simplified testing
+# Will add NSP back once basic deployment is confirmed working
 module "openai" {
   source = "./modules/openai"
   
-  resource_group_name            = azurerm_resource_group.main.name
-  location                      = azurerm_resource_group.main.location
-  private_endpoint_subnet_id    = var.private_endpoint_subnet_id
-  subscription_id               = var.subscription_id
-  vnet_address_space           = "172.20.160.0/24"
-  private_endpoint_subnet_cidr = "172.20.160.128/25"
-  component                    = var.component
-  environment                  = var.environment
-  region                       = var.region
-  sequence                     = var.sequence
+  resource_group_name        = azurerm_resource_group.main.name
+  location                  = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  component                 = var.component
+  environment               = var.environment
+  region                    = var.region
+  sequence                  = var.sequence
   
   tags = var.common_tags
 }
