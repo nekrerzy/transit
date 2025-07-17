@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.0"
+    }
+  }
+}
+
 # Azure OpenAI Service with enterprise security
 resource "azurerm_cognitive_account" "openai" {
   name                           = "oai-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
@@ -100,4 +109,60 @@ resource "azurerm_private_endpoint" "openai" {
   }
 
   tags = var.tags
+}
+
+# Network Security Perimeter for OpenAI (using AzAPI for preview features)
+resource "azapi_resource" "openai_nsp" {
+  type      = "Microsoft.Network/networkSecurityPerimeters@2023-07-01-preview"
+  name      = "nsp-oai-${var.component}-${var.environment}-${var.region}-${var.sequence}"
+  parent_id = "/subscriptions/${var.subscription_id}/resourceGroups/${var.resource_group_name}"
+  
+  body = {
+    location = var.location
+    properties = {
+      description = "Network Security Perimeter for OpenAI service"
+      perimeter = {
+        # Allow traffic from private endpoint subnet and VNet
+        allowedSources = [
+          {
+            addressPrefix = var.vnet_address_space
+            description = "Allow VNet traffic"
+          },
+          {
+            addressPrefix = var.private_endpoint_subnet_cidr
+            description = "Allow private endpoint subnet traffic"
+          }
+        ]
+        # Allow OpenAI service tags
+        allowedServiceTags = [
+          "CognitiveServices",
+          "AzureActiveDirectory",
+          "AzureResourceManager"
+        ]
+      }
+    }
+  }
+
+  tags = var.tags
+}
+
+# Associate OpenAI account with NSP
+resource "azapi_resource" "openai_nsp_association" {
+  type      = "Microsoft.Network/networkSecurityPerimeters/resourceAssociations@2023-07-01-preview"
+  name      = "assoc-${azurerm_cognitive_account.openai.name}"
+  parent_id = azapi_resource.openai_nsp.id
+  
+  body = {
+    properties = {
+      privateLinkResource = {
+        id = azurerm_cognitive_account.openai.id
+      }
+      accessMode = "enforced"
+    }
+  }
+  
+  depends_on = [
+    azurerm_cognitive_account.openai,
+    azapi_resource.openai_nsp
+  ]
 }
