@@ -111,37 +111,34 @@ resource "azurerm_private_endpoint" "openai" {
   tags = var.tags
 }
 
-# Network Security Perimeter for OpenAI (using AzAPI for preview features)
+# Network Security Perimeter for OpenAI
 resource "azapi_resource" "openai_nsp" {
-  type      = "Microsoft.Network/networkSecurityPerimeters@2023-07-01-preview"
+  type      = "Microsoft.Network/networkSecurityPerimeters@2024-07-01"
   name      = "nsp-oai-${var.component}-${var.environment}-${var.region}-${var.sequence}"
   parent_id = "/subscriptions/${var.subscription_id}/resourceGroups/${var.resource_group_name}"
-  
-  body = {
-    location = var.location
-    properties = {
-      description = "Network Security Perimeter for OpenAI service"
-    }
-  }
+  location  = var.location
+  body      = { properties = {} }
 
   tags = var.tags
 }
 
-# NSP Profile for OpenAI (simplified)
+# NSP Profile for OpenAI
 resource "azapi_resource" "openai_nsp_profile" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/profiles@2024-06-01-preview"
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles@2024-07-01"
   name      = "profile-oai-${var.component}-${var.environment}"
   parent_id = azapi_resource.openai_nsp.id
+  location  = var.location
   body      = { properties = {} }
-  
+
   depends_on = [azapi_resource.openai_nsp]
 }
 
 # NSP Outbound Access Rule for Cognitive Services
 resource "azapi_resource" "openai_nsp_outbound_rule" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2024-06-01-preview"
-  name      = "rule-openai-egress"
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2024-07-01"
+  name      = "rule-oai-egress"
   parent_id = azapi_resource.openai_nsp_profile.id
+  location  = var.location
   
   body = {
     properties = {
@@ -149,7 +146,7 @@ resource "azapi_resource" "openai_nsp_outbound_rule" {
       fullyQualifiedDomainNames = ["*.cognitiveservices.azure.com"]
     }
   }
-  
+
   depends_on = [azapi_resource.openai_nsp_profile]
 }
 
@@ -158,6 +155,7 @@ resource "azapi_resource" "openai_nsp_association" {
   type      = "Microsoft.Network/networkSecurityPerimeters/resourceAssociations@2024-07-01"
   name      = "assoc-oai-${var.component}-${var.environment}"
   parent_id = azapi_resource.openai_nsp.id
+  location  = var.location
   
   body = {
     properties = {
@@ -166,7 +164,7 @@ resource "azapi_resource" "openai_nsp_association" {
       accessMode          = "Learning"  # Change to "Enforced" after validation
     }
   }
-  
+
   depends_on = [
     azurerm_cognitive_account.openai,
     azapi_resource.openai_nsp_outbound_rule
