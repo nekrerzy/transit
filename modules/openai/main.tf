@@ -122,7 +122,9 @@ resource "azapi_resource" "openai_nsp" {
   parent_id = "/subscriptions/${var.subscription_id}/resourceGroups/${var.resource_group_name}"
   location  = var.location
   
-  body = {}
+  body = {
+    properties = {}
+  }
   
   response_export_values = ["*"]
   tags = var.tags
@@ -135,7 +137,9 @@ resource "azapi_resource" "openai_nsp_profile" {
   parent_id = azapi_resource.openai_nsp.id
   location  = azapi_resource.openai_nsp.location
   
-  body = {}
+  body = {
+    properties = {}
+  }
   
   response_export_values = ["*"]
   depends_on = [azapi_resource.openai_nsp]
@@ -149,8 +153,10 @@ resource "azapi_resource" "openai_nsp_inbound_rule" {
   location  = azapi_resource.openai_nsp_profile.location
   
   body = {
-    direction       = "Inbound"
-    addressPrefixes = [var.vnet_address_space, var.private_endpoint_subnet_cidr]
+    properties = {
+      direction       = "Inbound"
+      addressPrefixes = [var.vnet_address_space, var.private_endpoint_subnet_cidr]
+    }
   }
   
   response_export_values = ["*"]
@@ -165,8 +171,10 @@ resource "azapi_resource" "openai_nsp_outbound_rule" {
   location  = azapi_resource.openai_nsp_profile.location
   
   body = {
-    direction                 = "Outbound"
-    fullyQualifiedDomainNames = ["*.cognitiveservices.azure.com"]
+    properties = {
+      direction                 = "Outbound"
+      fullyQualifiedDomainNames = ["*.cognitiveservices.azure.com"]
+    }
   }
   
   response_export_values = ["*"]
@@ -181,13 +189,15 @@ resource "azapi_resource" "openai_nsp_association" {
   location  = azapi_resource.openai_nsp.location
   
   body = {
-    privateLinkResource = { 
-      id = azurerm_cognitive_account.openai.id 
+    properties = {
+      privateLinkResource = { 
+        id = azurerm_cognitive_account.openai.id 
+      }
+      profile = { 
+        id = azapi_resource.openai_nsp_profile.id 
+      }
+      accessMode = "Learning"  # Change to "Enforced" after validation
     }
-    profile = { 
-      id = azapi_resource.openai_nsp_profile.id 
-    }
-    accessMode = "Learning"  # Change to "Enforced" after validation
   }
   
   response_export_values = ["*"]
