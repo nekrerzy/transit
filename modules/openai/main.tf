@@ -121,29 +121,83 @@ resource "azapi_resource" "openai_nsp" {
     location = var.location
     properties = {
       description = "Network Security Perimeter for OpenAI service"
-      perimeter = {
-        # Allow traffic from private endpoint subnet and VNet
-        allowedSources = [
-          {
-            addressPrefix = var.vnet_address_space
-            description = "Allow VNet traffic"
-          },
-          {
-            addressPrefix = var.private_endpoint_subnet_cidr
-            description = "Allow private endpoint subnet traffic"
-          }
-        ]
-        # Allow OpenAI service tags
-        allowedServiceTags = [
-          "CognitiveServices",
-          "AzureActiveDirectory",
-          "AzureResourceManager"
-        ]
-      }
     }
   }
 
   tags = var.tags
+}
+
+# NSP Profile for OpenAI
+resource "azapi_resource" "openai_nsp_profile" {
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles@2023-07-01-preview"
+  name      = "profile-openai"
+  parent_id = azapi_resource.openai_nsp.id
+  
+  body = {
+    properties = {
+      description = "NSP Profile for OpenAI Cognitive Services"
+      # Allow inbound access from specified sources
+      accessRules = [
+        {
+          name = "allow-vnet-inbound"
+          properties = {
+            direction = "Inbound"
+            addressPrefixes = [
+              var.vnet_address_space,
+              var.private_endpoint_subnet_cidr
+            ]
+            subscriptions = [
+              {
+                id = var.subscription_id
+              }
+            ]
+          }
+        }
+      ]
+      # Allow outbound access to required services
+      accessRulesVersion = 1
+    }
+  }
+
+  depends_on = [azapi_resource.openai_nsp]
+}
+
+# NSP Access Rules for outbound traffic
+resource "azapi_resource" "openai_nsp_outbound_rule" {
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2023-07-01-preview"
+  name      = "allow-cognitive-services-outbound"
+  parent_id = azapi_resource.openai_nsp_profile.id
+  
+  body = {
+    properties = {
+      direction = "Outbound"
+      destinations = [
+        {
+          domainNames = [
+            "*.cognitive.microsoft.com",
+            "*.cognitiveservices.azure.com",
+            "*.openai.azure.com"
+          ]
+        }
+      ]
+      networkIdentifiers = [
+        {
+          networkIdentifierType = "ServiceTag"
+          identifier = "CognitiveServices"
+        },
+        {
+          networkIdentifierType = "ServiceTag"
+          identifier = "AzureActiveDirectory"
+        },
+        {
+          networkIdentifierType = "ServiceTag"
+          identifier = "AzureResourceManager"
+        }
+      ]
+    }
+  }
+
+  depends_on = [azapi_resource.openai_nsp_profile]
 }
 
 # Associate OpenAI account with NSP
@@ -157,12 +211,16 @@ resource "azapi_resource" "openai_nsp_association" {
       privateLinkResource = {
         id = azurerm_cognitive_account.openai.id
       }
+      profile = {
+        id = azapi_resource.openai_nsp_profile.id
+      }
       accessMode = "enforced"
     }
   }
   
   depends_on = [
     azurerm_cognitive_account.openai,
-    azapi_resource.openai_nsp
+    azapi_resource.openai_nsp_profile,
+    azapi_resource.openai_nsp_outbound_rule
   ]
 }
