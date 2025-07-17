@@ -149,7 +149,11 @@ resource "azurerm_postgresql_flexible_server" "main" {
 
   tags = var.tags
 
-  depends_on = [azurerm_key_vault_key.postgres_key]
+  depends_on = [
+    azurerm_key_vault_key.postgres_key,
+    azapi_resource.postgres_subnet,
+    data.azurerm_subnet.postgres
+  ]
 }
 
 # Private endpoint not needed - PostgreSQL uses delegated subnet for private access
