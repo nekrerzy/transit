@@ -26,27 +26,27 @@ output "resource_group_name" {
   value       = values(module.storage_accounts)[0].resource_group_name
 }
 
-# PostgreSQL outputs - COMMENTED OUT (module temporarily disabled)
-# output "postgresql_server_name" {
-#   description = "Name of the PostgreSQL server"
-#   value       = module.postgresql.postgresql_server_name
-# }
+# PostgreSQL outputs - RE-ENABLED
+output "postgresql_server_name" {
+  description = "Name of the PostgreSQL server"
+  value       = module.postgresql.postgresql_server_name
+}
 
-# output "postgresql_server_fqdn" {
-#   description = "FQDN of the PostgreSQL server"
-#   value       = module.postgresql.postgresql_server_fqdn
-# }
+output "postgresql_server_fqdn" {
+  description = "FQDN of the PostgreSQL server"
+  value       = module.postgresql.postgresql_server_fqdn
+}
 
-# output "postgresql_database_name" {
-#   description = "Name of the PostgreSQL database"
-#   value       = module.postgresql.database_name
-# }
+output "postgresql_database_name" {
+  description = "Name of the PostgreSQL database"
+  value       = module.postgresql.database_name
+}
 
-# output "postgresql_admin_password" {
-#   description = "Generated PostgreSQL admin password"
-#   value       = module.postgresql.admin_password
-#   sensitive   = true
-# }
+output "postgresql_admin_password" {
+  description = "Generated PostgreSQL admin password"
+  value       = module.postgresql.admin_password
+  sensitive   = true
+}
 
 # Azure Search outputs
 output "search_service_name" {
@@ -167,29 +167,29 @@ output "acr_private_ip" {
   value       = module.acr.private_endpoint_ip
 }
 
-# Azure OpenAI outputs - TESTING NSP RESTRICTIONS
-output "openai_account_name" {
-  description = "Name of the Azure OpenAI account"
-  value       = module.openai.openai_account_name
-}
+# Azure OpenAI outputs - COMMENTED OUT (blocked by organizational NSP)
+# output "openai_account_name" {
+#   description = "Name of the Azure OpenAI account"
+#   value       = module.openai.openai_account_name
+# }
 
-output "openai_endpoint" {
-  description = "Endpoint URL for Azure OpenAI"
-  value       = module.openai.openai_endpoint
-}
+# output "openai_endpoint" {
+#   description = "Endpoint URL for Azure OpenAI"
+#   value       = module.openai.openai_endpoint
+# }
 
-output "openai_primary_access_key" {
-  description = "Primary access key for Azure OpenAI"
-  value       = module.openai.openai_primary_access_key
-  sensitive   = true
-}
+# output "openai_primary_access_key" {
+#   description = "Primary access key for Azure OpenAI"
+#   value       = module.openai.openai_primary_access_key
+#   sensitive   = true
+# }
 
-output "gpt41_deployment_name" {
-  description = "Name of the GPT-4.1 deployment"
-  value       = module.openai.gpt41_deployment_name
-}
+# output "gpt41_deployment_name" {
+#   description = "Name of the GPT-4.1 deployment"
+#   value       = module.openai.gpt41_deployment_name
+# }
 
-output "embedding_deployment_name" {
-  description = "Name of the text embedding deployment"
-  value       = module.openai.embedding_deployment_name
-}
+# output "embedding_deployment_name" {
+#   description = "Name of the text embedding deployment"
+#   value       = module.openai.embedding_deployment_name
+# }

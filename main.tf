@@ -61,30 +61,27 @@ module "storage_accounts" {
   })
 }
 
-# PostgreSQL module - TEMPORARILY COMMENTED OUT (Azure internal server error)
-# Error: InternalServerError during PostgreSQL deployment 
-# Tracking ID: 6099a468-377a-4fa5-a951-6f42842004c5
-# Will re-enable after Azure service issue is resolved
-#
-# module "postgresql" {
-#   source = "./modules/postgresql"
-#   
-#   resource_group_name         = azurerm_resource_group.main.name
-#   location                   = azurerm_resource_group.main.location
-#   subscription_id            = var.subscription_id
-#   postgres_subnet_cidr        = var.postgres_subnet_cidr
-#   private_endpoint_subnet_id  = var.private_endpoint_subnet_id
-#   private_dns_zone_id         = var.postgresql_private_dns_zone_id
-#   network_resource_group_name = "rg-network-dev-incp-uaen-001"
-#   virtual_network_name        = "vnet-bain-dev-incp-uaen-001"
-#   # admin_password auto-generated in module
-#   component                  = var.component
-#   environment                = var.environment
-#   region                     = var.region
-#   sequence                   = var.sequence
-#   
-#   tags = var.common_tags
-# }
+# PostgreSQL module - RE-ENABLED FOR TESTING
+# Previous Azure InternalServerError may have been resolved
+module "postgresql" {
+  source = "./modules/postgresql"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  subscription_id            = var.subscription_id
+  postgres_subnet_cidr        = var.postgres_subnet_cidr
+  private_endpoint_subnet_id  = var.private_endpoint_subnet_id
+  private_dns_zone_id         = var.postgresql_private_dns_zone_id
+  network_resource_group_name = "rg-network-dev-incp-uaen-001"
+  virtual_network_name        = "vnet-bain-dev-incp-uaen-001"
+  # admin_password auto-generated in module
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
 
 # Azure Search module
 module "search" {
@@ -183,19 +180,20 @@ module "acr" {
   tags = var.common_tags
 }
 
-# Azure OpenAI module - BASIC DEPLOYMENT
-# NSP configuration temporarily removed for simplified testing
-# Will add NSP back once basic deployment is confirmed working
-module "openai" {
-  source = "./modules/openai"
-  
-  resource_group_name        = azurerm_resource_group.main.name
-  location                  = azurerm_resource_group.main.location
-  private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  component                 = var.component
-  environment               = var.environment
-  region                    = var.region
-  sequence                  = var.sequence
-  
-  tags = var.common_tags
-}
+# Azure OpenAI module - BLOCKED BY ORGANIZATIONAL NSP
+# Error: NetworkSecurityPerimeterTrafficDenied at subscription/org level
+# Requires security team approval - see message sent to security team
+# 
+# module "openai" {
+#   source = "./modules/openai"
+#   
+#   resource_group_name        = azurerm_resource_group.main.name
+#   location                  = azurerm_resource_group.main.location
+#   private_endpoint_subnet_id = var.private_endpoint_subnet_id
+#   component                 = var.component
+#   environment               = var.environment
+#   region                    = var.region
+#   sequence                  = var.sequence
+#   
+#   tags = var.common_tags
+# }
