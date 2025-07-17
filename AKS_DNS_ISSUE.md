@@ -28,16 +28,17 @@ The AKS nodes cannot resolve the Kubernetes API server's private DNS name becaus
 
 ## Technical Requirements for Network Team
 
-### 1. DNS Forwarder Configuration
+### 1. CONFIRMED: Use Existing Private DNS Zone (per Mohamed Soliman)
+**IMPORTANT UPDATE**: Mohamed confirmed we should use the existing Private DNS Zone:
+- **Zone**: `privatelink.uaenorth.azmk8s.io` (already exists)
+- **Status**: Not a custom zone (managed by Azure/organization)
+- **Action**: Use this existing zone instead of creating new one
+
+### 2. DNS Forwarder Configuration  
 Configure DNS forwarders in the hub DNS server (`172.20.1.132`) for:
 - `*.privatelink.uaenorth.azmk8s.io` → Forward to Azure DNS (168.63.129.16)
 - `*.uaenorth.azmk8s.io` → Forward to Azure DNS (168.63.129.16)
 - `*.privatelink.*.azmk8s.io` → Forward to Azure DNS (168.63.129.16) (wildcard for all regions)
-
-### 2. Private DNS Zone Integration
-Create private DNS zones in hub resource group:
-- `privatelink.uaenorth.azmk8s.io` (for UAE North region)
-- Link to hub virtual network for DNS resolution
 
 ### 3. DNS Server Configuration
 Update custom DNS servers in hub to:
@@ -120,10 +121,16 @@ All 9 private endpoints successfully resolve DNS through the hub architecture:
 **AKS (Failing)**: AKS Nodes → SNET-AKS → Hub DNS (172.20.1.132) → ❌ No forwarder for `*.azmk8s.io`
 
 ## Next Steps
-1. **Network Team**: Configure DNS forwarders for AKS domains on `172.20.1.132`
-2. **Testing**: Verify DNS resolution from AKS subnet (172.20.160.0/25)
-3. **Deployment**: Re-enable AKS module after DNS fixes
-4. **Validation**: Test complete container platform deployment
+1. **UPDATED**: Use existing Private DNS Zone `privatelink.uaenorth.azmk8s.io` per Mohamed
+2. **Network Team**: Configure DNS forwarders for AKS domains on `172.20.1.132`
+3. **Testing**: Verify DNS resolution from AKS subnet (172.20.160.0/25)  
+4. **Deployment**: Re-enable AKS module after DNS forwarders configured
+5. **Validation**: Test complete container platform deployment
+
+## Terraform Configuration Updated
+- **AKS module**: Now uses existing Private DNS Zone ID
+- **Variable**: `aks_private_dns_zone_id` updated with correct resource ID
+- **Ready**: AKS deployment ready once DNS forwarders configured
 
 ---
 *This issue is infrastructure-level and requires network team intervention rather than Terraform configuration changes.*
