@@ -111,62 +111,89 @@ resource "azurerm_private_endpoint" "openai" {
   tags = var.tags
 }
 
-# Network Security Perimeter for OpenAI
+# Network Security Perimeter for OpenAI (based on official documentation)
+locals {
+  nsp_api_version = "2023-08-01-preview"  # Documented working version
+}
+
 resource "azapi_resource" "openai_nsp" {
-  type      = "Microsoft.Network/networkSecurityPerimeters@2024-07-01"
-  name      = "nsp-oai-${var.component}-${var.environment}-${var.region}-${var.sequence}"
+  type      = "Microsoft.Network/networkSecurityPerimeters@${local.nsp_api_version}"
+  name      = "nsp-${var.component}-${var.environment}-${var.location}"
   parent_id = "/subscriptions/${var.subscription_id}/resourceGroups/${var.resource_group_name}"
   location  = var.location
-  body      = { properties = {} }
-
+  
+  body = {}
+  
+  response_export_values = ["*"]
   tags = var.tags
 }
 
 # NSP Profile for OpenAI
 resource "azapi_resource" "openai_nsp_profile" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/profiles@2024-07-01"
-  name      = "profile-oai-${var.component}-${var.environment}"
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles@${local.nsp_api_version}"
+  name      = "profile-${var.component}-${var.environment}-${var.location}"
   parent_id = azapi_resource.openai_nsp.id
-  location  = var.location
-  body      = { properties = {} }
-
+  location  = azapi_resource.openai_nsp.location
+  
+  body = {}
+  
+  response_export_values = ["*"]
   depends_on = [azapi_resource.openai_nsp]
+}
+
+# NSP Inbound Access Rule for VNet traffic
+resource "azapi_resource" "openai_nsp_inbound_rule" {
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@${local.nsp_api_version}"
+  name      = "rule-inbound-vnet"
+  parent_id = azapi_resource.openai_nsp_profile.id
+  location  = azapi_resource.openai_nsp_profile.location
+  
+  body = {
+    direction       = "Inbound"
+    addressPrefixes = [var.vnet_address_space, var.private_endpoint_subnet_cidr]
+  }
+  
+  response_export_values = ["*"]
+  depends_on = [azapi_resource.openai_nsp_profile]
 }
 
 # NSP Outbound Access Rule for Cognitive Services
 resource "azapi_resource" "openai_nsp_outbound_rule" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@2024-07-01"
-  name      = "rule-oai-egress"
+  type      = "Microsoft.Network/networkSecurityPerimeters/profiles/accessRules@${local.nsp_api_version}"
+  name      = "rule-outbound-cognitiveservices"
   parent_id = azapi_resource.openai_nsp_profile.id
-  location  = var.location
+  location  = azapi_resource.openai_nsp_profile.location
   
   body = {
-    properties = {
-      direction                 = "Outbound"
-      fullyQualifiedDomainNames = ["*.cognitiveservices.azure.com"]
-    }
+    direction                 = "Outbound"
+    fullyQualifiedDomainNames = ["*.cognitiveservices.azure.com"]
   }
-
+  
+  response_export_values = ["*"]
   depends_on = [azapi_resource.openai_nsp_profile]
 }
 
-# Associate OpenAI account with NSP
+# Resource Association for OpenAI
 resource "azapi_resource" "openai_nsp_association" {
-  type      = "Microsoft.Network/networkSecurityPerimeters/resourceAssociations@2024-07-01"
-  name      = "assoc-oai-${var.component}-${var.environment}"
+  type      = "Microsoft.Network/networkSecurityPerimeters/resourceAssociations@${local.nsp_api_version}"
+  name      = "assoc-${var.component}-${var.environment}"
   parent_id = azapi_resource.openai_nsp.id
-  location  = var.location
+  location  = azapi_resource.openai_nsp.location
   
   body = {
-    properties = {
-      privateLinkResource = { id = azurerm_cognitive_account.openai.id }
-      profile             = { id = azapi_resource.openai_nsp_profile.id }
-      accessMode          = "Learning"  # Change to "Enforced" after validation
+    privateLinkResource = { 
+      id = azurerm_cognitive_account.openai.id 
     }
+    profile = { 
+      id = azapi_resource.openai_nsp_profile.id 
+    }
+    accessMode = "Learning"  # Change to "Enforced" after validation
   }
-
+  
+  response_export_values = ["*"]
   depends_on = [
     azurerm_cognitive_account.openai,
+    azapi_resource.openai_nsp_inbound_rule,
     azapi_resource.openai_nsp_outbound_rule
   ]
 }
