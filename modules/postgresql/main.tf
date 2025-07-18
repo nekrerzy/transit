@@ -104,7 +104,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   location            = var.location
 
   # Server configuration
-  version                      = "17"
+  version                      = "16"
   administrator_login          = var.admin_username
   administrator_password       = random_password.postgres_admin.result
   sku_name                    = var.sku_name
