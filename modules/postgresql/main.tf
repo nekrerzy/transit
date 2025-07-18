@@ -80,22 +80,22 @@ resource "random_password" "postgres_admin" {
   numeric = true
 }
 
-# Key for PostgreSQL encryption in existing Key Vault
-resource "azurerm_key_vault_key" "postgres_key" {
-  name         = "key-postgres-${var.component}-${var.environment}-${var.sequence}"
-  key_vault_id = data.azurerm_key_vault.existing.id
-  key_type     = "RSA"
-  key_size     = 2048
-
-  key_opts = [
-    "decrypt",
-    "encrypt",
-    "sign",
-    "unwrapKey",
-    "verify",
-    "wrapKey",
-  ]
-}
+# Key for PostgreSQL encryption - COMMENTED OUT (using Service-managed keys)
+# resource "azurerm_key_vault_key" "postgres_key" {
+#   name         = "key-postgres-${var.component}-${var.environment}-${var.sequence}"
+#   key_vault_id = data.azurerm_key_vault.existing.id
+#   key_type     = "RSA"
+#   key_size     = 2048
+#
+#   key_opts = [
+#     "decrypt",
+#     "encrypt",
+#     "sign",
+#     "unwrapKey",
+#     "verify",
+#     "wrapKey",
+#   ]
+# }
 
 # Random suffix for globally unique PostgreSQL server name
 resource "random_string" "postgres_suffix" {
@@ -130,17 +130,9 @@ resource "azurerm_postgresql_flexible_server" "main" {
     standby_availability_zone = "2"  # Standby in different zone for true redundancy
   }
 
-  # CMK encryption - disable geo-redundant backup CMK due to identity requirements
-  customer_managed_key {
-    key_vault_key_id                  = azurerm_key_vault_key.postgres_key.id
-    primary_user_assigned_identity_id = data.azurerm_user_assigned_identity.existing.id
-    # geo_backup_key_vault_key_id         = azurerm_key_vault_key.postgres_key.id
-    # geo_backup_user_assigned_identity_id = data.azurerm_user_assigned_identity.existing.id
-  }
-
+  # System-assigned identity for automatic key management
   identity {
-    type         = "UserAssigned"
-    identity_ids = [data.azurerm_user_assigned_identity.existing.id]
+    type = "SystemAssigned"
   }
 
   # Network configuration
@@ -157,7 +149,6 @@ resource "azurerm_postgresql_flexible_server" "main" {
   tags = var.tags
 
   depends_on = [
-    azurerm_key_vault_key.postgres_key,
     azapi_resource.postgres_subnet,
     data.azurerm_subnet.postgres
   ]
