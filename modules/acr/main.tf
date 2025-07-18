@@ -29,6 +29,11 @@ resource "azurerm_key_vault_key" "acr_key" {
     "wrapKey",
   ]
 
+  # Prevent recreation due to expiration_date changes
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
+
   tags = var.tags
 }
 
