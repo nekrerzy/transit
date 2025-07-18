@@ -39,7 +39,7 @@ variable "admin_username" {
 variable "sku_name" {
   description = "PostgreSQL SKU name"
   type        = string
-  default     = "GP_Standard_D2s_v3"
+  default     = "GP_Standard_D4ds_v5"  # 4 vCore, 16GB RAM - latest generation
 }
 
 variable "storage_mb" {
