@@ -97,9 +97,16 @@ resource "azurerm_key_vault_key" "postgres_key" {
   ]
 }
 
+# Random suffix for globally unique PostgreSQL server name
+resource "random_string" "postgres_suffix" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
 # PostgreSQL Flexible Server with CMK encryption
 resource "azurerm_postgresql_flexible_server" "main" {
-  name                = "psql-bain-${var.environment}-incp-${var.region}-${var.sequence}"
+  name                = "psql-bain-${var.environment}-incp-${var.region}-${var.sequence}-${random_string.postgres_suffix.result}"
   resource_group_name = var.resource_group_name
   location            = var.location
 
