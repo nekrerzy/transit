@@ -61,27 +61,27 @@ module "storage_accounts" {
   })
 }
 
-# PostgreSQL module - RE-ENABLED FOR TESTING
-# Previous Azure InternalServerError may have been resolved
-module "postgresql" {
-  source = "./modules/postgresql"
-  
-  resource_group_name         = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  subscription_id            = var.subscription_id
-  postgres_subnet_cidr        = var.postgres_subnet_cidr
-  private_endpoint_subnet_id  = var.private_endpoint_subnet_id
-  private_dns_zone_id         = var.postgresql_private_dns_zone_id
-  network_resource_group_name = "rg-network-dev-incp-uaen-001"
-  virtual_network_name        = "vnet-bain-dev-incp-uaen-001"
-  # admin_password auto-generated in module
-  component                  = var.component
-  environment                = var.environment
-  region                     = var.region
-  sequence                   = var.sequence
-  
-  tags = var.common_tags
-}
+# PostgreSQL module - COMMENTED OUT (still failing deployment)
+# Previous Azure InternalServerError persists despite fixes
+# module "postgresql" {
+#   source = "./modules/postgresql"
+#   
+#   resource_group_name         = azurerm_resource_group.main.name
+#   location                   = azurerm_resource_group.main.location
+#   subscription_id            = var.subscription_id
+#   postgres_subnet_cidr        = var.postgres_subnet_cidr
+#   private_endpoint_subnet_id  = var.private_endpoint_subnet_id
+#   private_dns_zone_id         = var.postgresql_private_dns_zone_id
+#   network_resource_group_name = "rg-network-dev-incp-uaen-001"
+#   virtual_network_name        = "vnet-bain-dev-incp-uaen-001"
+#   # admin_password auto-generated in module
+#   component                  = var.component
+#   environment                = var.environment
+#   region                     = var.region
+#   sequence                   = var.sequence
+#   
+#   tags = var.common_tags
+# }
 
 # Azure Search module
 module "search" {
