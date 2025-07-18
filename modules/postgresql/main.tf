@@ -104,7 +104,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   location            = var.location
 
   # Server configuration
-  version                      = "15"
+  version                      = "17"
   administrator_login          = var.admin_username
   administrator_password       = random_password.postgres_admin.result
   sku_name                    = var.sku_name
@@ -156,7 +156,27 @@ resource "azurerm_postgresql_flexible_server" "main" {
   ]
 }
 
-# Private endpoint not needed - PostgreSQL uses delegated subnet for private access
+# Private endpoint for PostgreSQL (needed for hub-spoke architecture)
+resource "azurerm_private_endpoint" "postgres" {
+  name                = "pe-${azurerm_postgresql_flexible_server.main.name}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.private_endpoint_subnet_id
+
+  private_service_connection {
+    name                           = "psc-${azurerm_postgresql_flexible_server.main.name}"
+    private_connection_resource_id = azurerm_postgresql_flexible_server.main.id
+    subresource_names              = ["postgresqlServer"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [var.private_dns_zone_id]
+  }
+
+  tags = var.tags
+}
 
 # PostgreSQL configuration for security
 resource "azurerm_postgresql_flexible_server_configuration" "log_connections" {

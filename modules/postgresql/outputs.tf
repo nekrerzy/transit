@@ -19,7 +19,16 @@ output "postgresql_admin_username" {
   sensitive   = true
 }
 
-# Private endpoint not used - PostgreSQL has private access via delegated subnet
+# Private endpoint outputs
+output "private_endpoint_ip" {
+  description = "Private IP address of the PostgreSQL private endpoint"
+  value       = azurerm_private_endpoint.postgres.private_service_connection[0].private_ip_address
+}
+
+output "private_endpoint_id" {
+  description = "ID of the PostgreSQL private endpoint"
+  value       = azurerm_private_endpoint.postgres.id
+}
 
 output "database_name" {
   description = "Name of the created database"
