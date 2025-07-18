@@ -80,6 +80,11 @@ resource "azurerm_storage_account" "main" {
 
   tags = var.tags
 
+  # Prevent drift from Key Vault key version updates
+  lifecycle {
+    ignore_changes = [customer_managed_key[0].key_vault_key_id]
+  }
+
   depends_on = [
     azurerm_key_vault_key.storage_key
   ]
