@@ -138,25 +138,25 @@ module "key_vaults" {
   })
 }
 
-# AKS module - COMMENTED OUT FOR POSTGRESQL TESTING
-# Updated per Mohamed Soliman: Using existing privatelink.uaenorth.azmk8s.io zone
-# DNS zone already exists in rg-dns-prd-incp-uaen-001
-# module "aks" {
-#   source = "./modules/aks"
-#   
-#   resource_group_name         = azurerm_resource_group.main.name
-#   location                   = azurerm_resource_group.main.location
-#   private_endpoint_subnet_id = var.private_endpoint_subnet_id
-#   private_dns_zone_id        = var.aks_private_dns_zone_id
-#   log_analytics_workspace_id = var.log_analytics_workspace_id
-#   aks_subnet_id              = var.aks_subnet_id
-#   component                  = var.component
-#   environment                = var.environment
-#   region                     = var.region
-#   sequence                   = var.sequence
-#   
-#   tags = var.common_tags
-# }
+# AKS module - RE-ENABLED FOR TESTING WITH POSTGRESQL
+# Updated per Mohamed Soliman: Using null DNS zone (existing hub virtual link)
+# AKS uses SystemAssigned identity and fixed service CIDR
+module "aks" {
+  source = "./modules/aks"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  private_endpoint_subnet_id = var.private_endpoint_subnet_id
+  private_dns_zone_id        = var.aks_private_dns_zone_id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+  aks_subnet_id              = var.aks_subnet_id
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
 
 # Azure Container Registry module
 module "acr" {

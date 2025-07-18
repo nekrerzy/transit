@@ -104,47 +104,47 @@ output "key_vault_uris" {
   }
 }
 
-# AKS outputs - COMMENTED OUT FOR POSTGRESQL TESTING
-# output "aks_cluster_name" {
-#   description = "Name of the AKS cluster"
-#   value       = module.aks.aks_cluster_name
-# }
+# AKS outputs - RE-ENABLED FOR TESTING
+output "aks_cluster_name" {
+  description = "Name of the AKS cluster"
+  value       = module.aks.aks_cluster_name
+}
 
-# output "aks_cluster_fqdn" {
-#   description = "FQDN of the AKS cluster"
-#   value       = module.aks.aks_cluster_fqdn
-# }
+output "aks_cluster_fqdn" {
+  description = "FQDN of the AKS cluster"
+  value       = module.aks.aks_cluster_fqdn
+}
 
-# output "aks_cluster_private_fqdn" {
-#   description = "Private FQDN of the AKS cluster"
-#   value       = module.aks.aks_cluster_private_fqdn
-# }
+output "aks_cluster_private_fqdn" {
+  description = "Private FQDN of the AKS cluster"
+  value       = module.aks.aks_cluster_private_fqdn
+}
 
-# output "aks_kube_config" {
-#   description = "Kubernetes configuration for the AKS cluster"
-#   value       = module.aks.aks_kube_config
-#   sensitive   = true
-# }
+output "aks_kube_config" {
+  description = "Kubernetes configuration for the AKS cluster"
+  value       = module.aks.aks_kube_config
+  sensitive   = true
+}
 
-# output "aks_oidc_issuer_url" {
-#   description = "OIDC issuer URL for workload identity"
-#   value       = module.aks.aks_oidc_issuer_url
-# }
+output "aks_oidc_issuer_url" {
+  description = "OIDC issuer URL for workload identity"
+  value       = module.aks.aks_oidc_issuer_url
+}
 
-# output "system_node_pool_name" {
-#   description = "Name of the system node pool"
-#   value       = module.aks.system_node_pool_name
-# }
+output "system_node_pool_name" {
+  description = "Name of the system node pool"
+  value       = module.aks.system_node_pool_name
+}
 
-# output "user_apps_node_pool_name" {
-#   description = "Name of the user apps node pool"
-#   value       = module.aks.user_apps_node_pool_name
-# }
+output "user_apps_node_pool_name" {
+  description = "Name of the user apps node pool"
+  value       = module.aks.user_apps_node_pool_name
+}
 
-# output "vllm_node_pool_name" {
-#   description = "Name of the VLLM node pool"
-#   value       = module.aks.vllm_node_pool_name
-# }
+output "vllm_node_pool_name" {
+  description = "Name of the VLLM node pool"
+  value       = module.aks.vllm_node_pool_name
+}
 
 # Azure Container Registry outputs
 output "acr_name" {
