@@ -34,6 +34,11 @@ resource "azurerm_key_vault_key" "storage_key" {
     "verify",
     "wrapKey",
   ]
+
+  # Prevent recreation due to expiration_date changes
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
 }
 
 # Storage account with CMK encryption and no access keys
