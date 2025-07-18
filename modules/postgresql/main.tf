@@ -204,12 +204,12 @@ resource "azurerm_postgresql_flexible_server_configuration" "log_statement" {
   value     = "all"
 }
 
-# Example database (optional)
-resource "azurerm_postgresql_flexible_server_database" "example" {
-  name      = "${var.component}_${var.environment}"
-  server_id = azurerm_postgresql_flexible_server.main.id
-  collation = "en_US.utf8"
-  charset   = "utf8"
-
-  count = var.create_sample_database ? 1 : 0
-}
+# Example database (optional) - COMMENTED OUT FOR INITIAL DEPLOYMENT
+# resource "azurerm_postgresql_flexible_server_database" "example" {
+#   name      = "${var.component}_${var.environment}"
+#   server_id = azurerm_postgresql_flexible_server.main.id
+#   collation = "en_US.utf8"
+#   charset   = "utf8"
+#
+#   count = var.create_sample_database ? 1 : 0
+# }

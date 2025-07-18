@@ -37,10 +37,10 @@ output "postgresql_server_fqdn" {
   value       = module.postgresql.postgresql_server_fqdn
 }
 
-output "postgresql_database_name" {
-  description = "Name of the PostgreSQL database"
-  value       = module.postgresql.database_name
-}
+# output "postgresql_database_name" {
+#   description = "Name of the PostgreSQL database"
+#   value       = module.postgresql.database_name
+# }
 
 output "postgresql_admin_password" {
   description = "Generated PostgreSQL admin password"

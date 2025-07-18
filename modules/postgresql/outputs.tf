@@ -30,10 +30,11 @@ output "private_endpoint_id" {
   value       = azurerm_private_endpoint.postgres.id
 }
 
-output "database_name" {
-  description = "Name of the created database"
-  value       = var.create_sample_database ? azurerm_postgresql_flexible_server_database.example[0].name : null
-}
+# Database name output - COMMENTED OUT (optional database disabled)
+# output "database_name" {
+#   description = "Name of the created database"
+#   value       = var.create_sample_database ? azurerm_postgresql_flexible_server_database.example[0].name : null
+# }
 
 output "admin_password" {
   description = "Generated administrator password"
