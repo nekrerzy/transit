@@ -127,7 +127,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   # High availability - required by policy for zone resiliency
   high_availability {
     mode                      = "ZoneRedundant"
-    standby_availability_zone = "3"  # Use zone 3 for UAE North
+    standby_availability_zone = "2"  # Standby in different zone for true redundancy
   }
 
   # CMK encryption - disable geo-redundant backup CMK due to identity requirements
