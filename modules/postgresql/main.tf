@@ -99,7 +99,7 @@ resource "azurerm_key_vault_key" "postgres_key" {
 
 # PostgreSQL Flexible Server with CMK encryption
 resource "azurerm_postgresql_flexible_server" "main" {
-  name                = "psql-bain-${var.component}-${var.environment}-incp-${var.region}-${var.sequence}"
+  name                = "psql-bain-${var.environment}-incp-${var.region}-${var.sequence}"
   resource_group_name = var.resource_group_name
   location            = var.location
 
