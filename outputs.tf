@@ -26,27 +26,27 @@ output "resource_group_name" {
   value       = values(module.storage_accounts)[0].resource_group_name
 }
 
-# PostgreSQL outputs - COMMENTED OUT FOR AKS TESTING
-# output "postgresql_server_name" {
-#   description = "Name of the PostgreSQL server"
-#   value       = module.postgresql.postgresql_server_name
-# }
+# PostgreSQL outputs - RE-ENABLED
+output "postgresql_server_name" {
+  description = "Name of the PostgreSQL server"
+  value       = module.postgresql.postgresql_server_name
+}
 
-# output "postgresql_server_fqdn" {
-#   description = "FQDN of the PostgreSQL server"
-#   value       = module.postgresql.postgresql_server_fqdn
-# }
+output "postgresql_server_fqdn" {
+  description = "FQDN of the PostgreSQL server"
+  value       = module.postgresql.postgresql_server_fqdn
+}
 
-# output "postgresql_database_name" {
-#   description = "Name of the PostgreSQL database"
-#   value       = module.postgresql.database_name
-# }
+output "postgresql_database_name" {
+  description = "Name of the PostgreSQL database"
+  value       = module.postgresql.database_name
+}
 
-# output "postgresql_admin_password" {
-#   description = "Generated PostgreSQL admin password"
-#   value       = module.postgresql.admin_password
-#   sensitive   = true
-# }
+output "postgresql_admin_password" {
+  description = "Generated PostgreSQL admin password"
+  value       = module.postgresql.admin_password
+  sensitive   = true
+}
 
 # Azure Search outputs
 output "search_service_name" {
@@ -104,47 +104,47 @@ output "key_vault_uris" {
   }
 }
 
-# AKS outputs - RE-ENABLED (using existing DNS zone per Mohamed)
-output "aks_cluster_name" {
-  description = "Name of the AKS cluster"
-  value       = module.aks.aks_cluster_name
-}
+# AKS outputs - COMMENTED OUT FOR POSTGRESQL TESTING
+# output "aks_cluster_name" {
+#   description = "Name of the AKS cluster"
+#   value       = module.aks.aks_cluster_name
+# }
 
-output "aks_cluster_fqdn" {
-  description = "FQDN of the AKS cluster"
-  value       = module.aks.aks_cluster_fqdn
-}
+# output "aks_cluster_fqdn" {
+#   description = "FQDN of the AKS cluster"
+#   value       = module.aks.aks_cluster_fqdn
+# }
 
-output "aks_cluster_private_fqdn" {
-  description = "Private FQDN of the AKS cluster"
-  value       = module.aks.aks_cluster_private_fqdn
-}
+# output "aks_cluster_private_fqdn" {
+#   description = "Private FQDN of the AKS cluster"
+#   value       = module.aks.aks_cluster_private_fqdn
+# }
 
-output "aks_kube_config" {
-  description = "Kubernetes configuration for the AKS cluster"
-  value       = module.aks.aks_kube_config
-  sensitive   = true
-}
+# output "aks_kube_config" {
+#   description = "Kubernetes configuration for the AKS cluster"
+#   value       = module.aks.aks_kube_config
+#   sensitive   = true
+# }
 
-output "aks_oidc_issuer_url" {
-  description = "OIDC issuer URL for workload identity"
-  value       = module.aks.aks_oidc_issuer_url
-}
+# output "aks_oidc_issuer_url" {
+#   description = "OIDC issuer URL for workload identity"
+#   value       = module.aks.aks_oidc_issuer_url
+# }
 
-output "system_node_pool_name" {
-  description = "Name of the system node pool"
-  value       = module.aks.system_node_pool_name
-}
+# output "system_node_pool_name" {
+#   description = "Name of the system node pool"
+#   value       = module.aks.system_node_pool_name
+# }
 
-output "user_apps_node_pool_name" {
-  description = "Name of the user apps node pool"
-  value       = module.aks.user_apps_node_pool_name
-}
+# output "user_apps_node_pool_name" {
+#   description = "Name of the user apps node pool"
+#   value       = module.aks.user_apps_node_pool_name
+# }
 
-output "vllm_node_pool_name" {
-  description = "Name of the VLLM node pool"
-  value       = module.aks.vllm_node_pool_name
-}
+# output "vllm_node_pool_name" {
+#   description = "Name of the VLLM node pool"
+#   value       = module.aks.vllm_node_pool_name
+# }
 
 # Azure Container Registry outputs
 output "acr_name" {

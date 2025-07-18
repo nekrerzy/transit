@@ -61,27 +61,27 @@ module "storage_accounts" {
   })
 }
 
-# PostgreSQL module - COMMENTED OUT FOR AKS TESTING
+# PostgreSQL module - RE-ENABLED FOR TESTING
 # Previous Azure InternalServerError may have been resolved
-# module "postgresql" {
-#   source = "./modules/postgresql"
-#   
-#   resource_group_name         = azurerm_resource_group.main.name
-#   location                   = azurerm_resource_group.main.location
-#   subscription_id            = var.subscription_id
-#   postgres_subnet_cidr        = var.postgres_subnet_cidr
-#   private_endpoint_subnet_id  = var.private_endpoint_subnet_id
-#   private_dns_zone_id         = var.postgresql_private_dns_zone_id
-#   network_resource_group_name = "rg-network-dev-incp-uaen-001"
-#   virtual_network_name        = "vnet-bain-dev-incp-uaen-001"
-#   # admin_password auto-generated in module
-#   component                  = var.component
-#   environment                = var.environment
-#   region                     = var.region
-#   sequence                   = var.sequence
-#   
-#   tags = var.common_tags
-# }
+module "postgresql" {
+  source = "./modules/postgresql"
+  
+  resource_group_name         = azurerm_resource_group.main.name
+  location                   = azurerm_resource_group.main.location
+  subscription_id            = var.subscription_id
+  postgres_subnet_cidr        = var.postgres_subnet_cidr
+  private_endpoint_subnet_id  = var.private_endpoint_subnet_id
+  private_dns_zone_id         = var.postgresql_private_dns_zone_id
+  network_resource_group_name = "rg-network-dev-incp-uaen-001"
+  virtual_network_name        = "vnet-bain-dev-incp-uaen-001"
+  # admin_password auto-generated in module
+  component                  = var.component
+  environment                = var.environment
+  region                     = var.region
+  sequence                   = var.sequence
+  
+  tags = var.common_tags
+}
 
 # Azure Search module
 module "search" {
@@ -138,25 +138,25 @@ module "key_vaults" {
   })
 }
 
-# AKS module - TESTING WITH EXISTING PRIVATE DNS ZONE
+# AKS module - COMMENTED OUT FOR POSTGRESQL TESTING
 # Updated per Mohamed Soliman: Using existing privatelink.uaenorth.azmk8s.io zone
 # DNS zone already exists in rg-dns-prd-incp-uaen-001
-module "aks" {
-  source = "./modules/aks"
-  
-  resource_group_name         = azurerm_resource_group.main.name
-  location                   = azurerm_resource_group.main.location
-  private_endpoint_subnet_id = var.private_endpoint_subnet_id
-  private_dns_zone_id        = var.aks_private_dns_zone_id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-  aks_subnet_id              = var.aks_subnet_id
-  component                  = var.component
-  environment                = var.environment
-  region                     = var.region
-  sequence                   = var.sequence
-  
-  tags = var.common_tags
-}
+# module "aks" {
+#   source = "./modules/aks"
+#   
+#   resource_group_name         = azurerm_resource_group.main.name
+#   location                   = azurerm_resource_group.main.location
+#   private_endpoint_subnet_id = var.private_endpoint_subnet_id
+#   private_dns_zone_id        = var.aks_private_dns_zone_id
+#   log_analytics_workspace_id = var.log_analytics_workspace_id
+#   aks_subnet_id              = var.aks_subnet_id
+#   component                  = var.component
+#   environment                = var.environment
+#   region                     = var.region
+#   sequence                   = var.sequence
+#   
+#   tags = var.common_tags
+# }
 
 # Azure Container Registry module
 module "acr" {
