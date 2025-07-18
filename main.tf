@@ -61,6 +61,28 @@ module "storage_accounts" {
   })
 }
 
+# PostgreSQL subnet - STANDALONE FOR PORTAL CREATION
+# Create PostgreSQL subnet even though server module is disabled
+resource "azapi_resource" "postgres_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2023-11-01"
+  name      = "SNET-POSTGRES"
+  parent_id = "/subscriptions/${var.subscription_id}/resourceGroups/rg-network-dev-incp-uaen-001/providers/Microsoft.Network/virtualNetworks/vnet-bain-dev-incp-uaen-001"
+
+  body = {
+    properties = {
+      addressPrefixes = [var.postgres_subnet_cidr]
+      delegations = [
+        {
+          name = "postgres-delegation"
+          properties = {
+            serviceName = "Microsoft.DBforPostgreSQL/flexibleServers"
+          }
+        }
+      ]
+    }
+  }
+}
+
 # PostgreSQL module - COMMENTED OUT (still failing deployment)
 # Previous Azure InternalServerError persists despite fixes
 # module "postgresql" {
